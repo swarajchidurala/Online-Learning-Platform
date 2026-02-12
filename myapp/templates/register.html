@@ -1,0 +1,540 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'myapp/image/icon.png' %}" type="image/x-icon">
+    <title>Register - EduPlatfrom⭐💫✨</title>
+    <style>
+        /* General Body and Container Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* A modern, clean font like the image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8faff;
+            /* Light background to match EduPlatfrom theme */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .register-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 450px;
+            /* Slightly wider for more fields */
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Logo and Heading */
+        .register-container .logo-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            color: #4A4AFB;
+            /* Primary brand color from the image */
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .register-container .logo-brand svg {
+            margin-right: 10px;
+            fill: #4A4AFB;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+            /* Added for relative positioning of the wrapper */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        /* Wrapper for Input and Icon */
+        .input-with-icon {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
+            /* Added padding-right to make room for the icon */
+            padding-right: 45px;
+        }
+
+        .form-group input:focus {
+            border-color: #4A4AFB;
+            box-shadow: 0 0 0 3px rgba(74, 74, 251, 0.2);
+            outline: none;
+        }
+
+        /* Styles for the SVG Eye Icon */
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+            z-index: 10;
+        }
+
+        .toggle-password:hover {
+            color: #555;
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            /* Adjust size for a minimalist look */
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Hide the slash part of the icon when password is shown */
+        .eye-slash-line {
+            transition: opacity 0.3s;
+        }
+
+        /* When the 'show' class is present (i.e., password is visible), hide the slash line */
+        .toggle-password.show .eye-slash-line {
+            opacity: 0;
+        }
+
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px 20px;
+            background-color: #4A4AFB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a3ad0;
+            box-shadow: 0 5px 15px rgba(74, 74, 251, 0.3);
+            outline: none;
+        }
+
+        .login-link {
+            margin-top: 30px;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #4A4AFB;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .login-link a:hover {
+            color: #3a3ad0;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            /* overflow: hidden; */
+            height: 35px;
+            background-color: #efefef;
+        }
+
+
+        .tab {
+            flex: 1;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            background: #efefef;
+            margin: 4px;
+            font-size: medium;
+            font-weight: 300;
+            border-radius: 6px;
+            color: #797979;
+        }
+
+        .tab:hover {
+            color: black;
+        }
+
+        .tab.active {
+            background: #ffffff;
+            margin: 3px;
+            font-size: medium;
+            font-weight: 300;
+            border-radius: 6px;
+            color: #4A4AFB;
+        }
+
+        /* Confirmation Message Styling */
+        .confirm-message {
+            color: #52c41a;
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            padding: 1px;
+            margin: 0 auto 10px auto;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            /* Hidden by default, shown when there's a confirmation */
+            font-size: 0.9em;
+        }
+
+        .confirm-message p {
+            margin: 5px;
+        }
+
+        .confirm-message p::before {
+            content: "✔";
+            /* Checkmark symbol */
+            font-weight: bold;
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            color: #ff4d4f;
+            background-color: #fff1f0;
+            border: 1px solid #ffa39e;
+            padding: 1px;
+            margin: 0 auto 10px auto;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            /* Hidden by default, shown when there's an error */
+            font-size: 0.9em;
+        }
+
+        .error-message p {
+            margin: 5px;
+        }
+
+        .error-message p::before {
+            content: "⚠";
+            /* Warning symbol */
+            font-weight: bold;
+        }
+
+        .error {
+            border-color: #ff4d4f !important;
+            box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.2) !important;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+        }
+
+        #childNameField {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register-container">
+        <div class="logo-brand">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M12 2L2 7V17L12 22L22 17V7L12 2ZM12 4.09L19.49 8.29L12 12.49L4.51 8.29L12 4.09ZM4 10.42L11 14.39V20.11L4 16.29V10.42ZM13 20.11V14.39L20 10.42V16.29L13 20.11Z"
+                    fill="currentColor" />
+            </svg>
+            EduPlatfrom
+        </div>
+        <h2>Create Your Account</h2>
+        <form action="" method="POST" id="registerForm" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="user_type" id="user_type" value="student">
+            <div class="tabs">
+                <button type="button" id="studentTab" class="tab active">Student</button>
+                <button type="button" id="parentTab" class="tab">Parent</button>
+                <button type="button" id="teacherTab" class="tab">Teacher</button>
+            </div>
+            <div id="error-message" class="error-message"></div>
+            <div id="confirm-message" class="confirm-message"></div>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="fullname" placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Create username">
+            </div>
+
+            <div class="form-group" id="childNameField">
+                <label for="childname">Child Name</label>
+                <input type="text" id="childname" name="childname" placeholder="Enter your child name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-with-icon">
+                    <input type="password" id="password" name="password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <div class="input-with-icon">
+                    <input type="password" id="confirm-password" name="confirm_password" placeholder="••••••••">
+                    <div class="toggle-password" data-target="confirm-password" id="toggleConfirmPassword">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                            <line x1="2" y1="2" x2="22" y2="22" class="eye-slash-line" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="register-button">Register</button>
+        </form>
+        <div class="login-link">
+            Already have an account? <a href="{% url 'login' %}">Log In</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all password toggles
+            const toggles = document.querySelectorAll('.toggle-password');
+
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    // Get the ID of the target input from the data-target attribute
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+
+                    // Toggle the type attribute
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // Toggle the 'show' class on the icon element to change its appearance
+                    this.classList.toggle('show');
+                });
+            });
+        });
+
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+            });
+        });
+
+
+        const studentTab = document.getElementById("studentTab");
+        const parentTab = document.getElementById("parentTab");
+        const teacherTab = document.getElementById("teacherTab");
+        const childNameField = document.getElementById("childNameField");
+        const userTypeInput = document.getElementById("userTypeInput"); // Wait, I named it user_type in html but variable here? I should use document.getElementById('user_type')
+
+        // Initially, student tab is active, so child name not required
+        document.getElementById("childname").required = false;
+
+        studentTab.addEventListener("click", () => {
+            studentTab.classList.add("active");
+            parentTab.classList.remove("active");
+            teacherTab.classList.remove("active");
+            childNameField.style.display = "none"; // Hide child name
+            document.getElementById("user_type").value = "student";
+            document.getElementById("childname").required = false;
+            document.getElementById("registerForm").reset();
+            document.getElementById("user_type").value = "student"; // Reset clears hidden inputs? No usually, but safe to set again.
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+            document.getElementById("name").classList.remove("error");
+            document.getElementById("username").classList.remove("error");
+            document.getElementById("email").classList.remove("error");
+            document.getElementById("password").classList.remove("error");
+            document.getElementById("childname").classList.remove("error");
+            document.getElementById("confirm-password").classList.remove("error");
+        });
+
+        parentTab.addEventListener("click", () => {
+            parentTab.classList.add("active");
+            studentTab.classList.remove("active");
+            teacherTab.classList.remove("active");
+            childNameField.style.display = "block"; // Show child name
+            document.getElementById("user_type").value = "parent";
+            document.getElementById("childname").required = true;
+            document.getElementById("registerForm").reset();
+            document.getElementById("user_type").value = "parent";
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+            document.getElementById("name").classList.remove("error");
+            document.getElementById("username").classList.remove("error");
+            document.getElementById("email").classList.remove("error");
+            document.getElementById("password").classList.remove("error");
+            document.getElementById("childname").classList.remove("error");
+            document.getElementById("confirm-password").classList.remove("error");
+        });
+
+        teacherTab.addEventListener("click", () => {
+            teacherTab.classList.add("active");
+            studentTab.classList.remove("active");
+            parentTab.classList.remove("active");
+            // usernameField.style.display = "block"; // Show username
+            childNameField.style.display = "none"; // Hide child name
+            document.getElementById("user_type").value = "teacher";
+            document.getElementById("childname").required = false;
+            document.getElementById("registerForm").reset();
+            document.getElementById("user_type").value = "teacher";
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+            document.getElementById("name").classList.remove("error");
+            document.getElementById("username").classList.remove("error");
+            document.getElementById("email").classList.remove("error");
+            document.getElementById("password").classList.remove("error");
+            document.getElementById("childname").classList.remove("error");
+            document.getElementById("confirm-password").classList.remove("error");
+        });
+
+        document.getElementById("registerForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Hide previous messages
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+
+            const name = document.getElementById("name");
+            const email = document.getElementById("email");
+            const username = document.getElementById("username");
+            const password = document.getElementById("password");
+            const confirmPassword = document.getElementById("confirm-password");
+            const childname = document.getElementById("childname");
+
+            // Reset error styles
+            name.classList.remove("error");
+            email.classList.remove("error");
+            username.classList.remove("error");
+            password.classList.remove("error");
+            confirmPassword.classList.remove("error");
+            childname.classList.remove("error");
+
+            let isValid = true;
+            let errorMsg = "";
+
+            // Check if student or parent
+            const isStudent = studentTab.classList.contains("active");
+            const isTeacher = teacherTab.classList.contains("active");
+            const isParent = parentTab.classList.contains("active");
+
+            if (!name.value.trim()) {
+                name.classList.add("error");
+                isValid = false;
+                errorMsg += "Full Name is required. ";
+            }
+
+            if (!username.value.trim()) {
+                username.classList.add("error");
+                isValid = false;
+                errorMsg += "Username is required. ";
+            }
+
+            if (!email.value.trim()) {
+                email.classList.add("error");
+                isValid = false;
+                errorMsg += "Email is required. ";
+            } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.value.trim())) {
+                email.classList.add("error");
+                isValid = false;
+                errorMsg += "Please enter a valid email address. ";
+            }
+
+            if (!password.value) {
+                password.classList.add("error");
+                isValid = false;
+                errorMsg += "Password is required. ";
+            }
+
+            if (!confirmPassword.value) {
+                confirmPassword.classList.add("error");
+                isValid = false;
+                errorMsg += "Confirm Password is required. ";
+            }
+
+            if (!isStudent && !isTeacher && !childname.value.trim()) {
+                childname.classList.add("error");
+                isValid = false;
+                errorMsg += "Child Name is required for parents. ";
+            }
+
+
+            if (password.value && confirmPassword.value && password.value !== confirmPassword.value) {
+                password.classList.add("error");
+                confirmPassword.classList.add("error");
+                isValid = false;
+                errorMsg += "Passwords do not match. ";
+            }
+
+            if (isValid) {
+                // Form is valid, allow submission
+                // Note: Since we use event.preventDefault(), we must manually submit the form after validation passes.
+                // However, the original code intended to just redirect.
+                // We should actually submit the form to the backend now.
+                // Removing preventDefault or calling submit()
+                this.submit();
+            } else {
+                document.getElementById("error-message").innerHTML = "<p> " + errorMsg + "</p>";
+                document.getElementById("error-message").style.display = 'block';
+            }
+        });
+
+    </script>
+</body>
+
+</html>

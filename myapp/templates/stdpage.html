@@ -1,0 +1,1053 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'myapp/image/icon.png' %}" type="image/x-icon">
+    <title>Student Dashboard⭐💫✨</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        /* --- Global Reset & Variables --- */
+        :root {
+            --primary-color: #2961eb;
+            /* Deep Purple */
+            --secondary-color: #6a63d7;
+            /* Lighter Purple */
+            --bg-light: #f4f7f9;
+            --text-dark: #333;
+            --text-light: #666;
+            --card-bg: #fff;
+            --border-radius: 12px;
+            --potential-color: linear-gradient(90deg, #2961eb, #8f34ea);
+            --border: 1px solid #e0e0e0;
+            --opacity: 1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* --- Dashboard Layout (Flexbox/Grid) --- */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar Styles (Left) --- */
+        .sidebar {
+            position: fixed;
+            width: 250px;
+            height: 100vh;
+            padding: 30px 20px;
+            background: var(--card-bg);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Sidebar Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-90px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar {
+            animation: slideIn 0.9s ease forwards;
+        }
+
+        .logo {
+            margin: 0 auto 40px auto;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+        }
+
+
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Sidebar Animation/Hover */
+        .nav-item:hover {
+            background-color: #f0f3f5;
+            color: var(--primary-color);
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            color: white;
+            box-shadow: 0 4px 8px rgba(91, 84, 168, 0.4);
+        }
+
+        /* The subtle click animation from the video */
+        .nav-item:active {
+            transform: scale(0.98);
+        }
+
+        .user-info-mobile {
+            display: none;
+            /* Only for smaller screens */
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 0 30px 30px 30px;
+            margin-left: 250px;
+            /* Width of sidebar */
+            overflow-y: auto;
+        }
+
+        /* --- Header Styles (Top) --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            position: fixed;
+            z-index: 1000;
+            align-items: center;
+            padding: 20px 20px;
+            margin-bottom: 20px;
+            height: 64px;
+            width: 80%;
+            border-radius: 0 0 12px 12px;
+            /* border:var(--border); */
+            background-color: rgba(255, 255, 255, 0.3);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(1px);
+            animation: bounceIn 0.5s;
+            /* transition: transform 0.1s; */
+        }
+
+        /* Header Navigation Animation */
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px);
+                /* Start far above */
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(15px);
+                /* Bounce down past final position */
+            }
+
+            80% {
+                transform: translateY(-5px);
+                /* Bounce up slightly */
+            }
+
+            100% {
+                transform: translateY(0);
+                /* Settle at final position */
+            }
+        }
+
+        .header-nav a {
+            text-decoration: none;
+            color: var(--text-light);
+            margin-right: 25px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .user-profile {
+            float: right;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .user-profile img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-left: 10px;
+            color: var(--primary-color);
+        }
+
+        .logout i {
+            font-size: 1.0rem;
+            margin-left: 30px;
+            color: #333;
+        }
+
+        .logout i:hover {
+            padding: 8px;
+            background-color: #a0a0a038;
+            border-radius: 5px;
+        }
+
+        /* --- Dashboard Overview --- */
+        .welcome-banner {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            margin-top: 80px;
+            box-shadow: 0 8px 15px rgba(91, 84, 168, 0.4);
+        }
+
+        /* Welcome Message Animation */
+        @keyframes banner {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-banner {
+            animation: banner 0.5s ease forwards;
+        }
+
+        .welcome-banner h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .welcome-banner p {
+            opacity: 0.9;
+        }
+
+        /* --- Stats Cards Layout --- */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border: var(--border);
+            border-radius: var(--border-radius);
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: box-shadow;
+            animation-delay: 0.9s;
+            /* Staggered delay for each card */
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Stats Card Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card:nth-child(1) {
+            opacity: 0;
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .stat-card:nth-child(3) {
+            opacity: 0;
+            animation-delay: 0.5s;
+        }
+
+        .stat-card:nth-child(4) {
+            opacity: 0;
+            animation-delay: 0.7s;
+        }
+
+        /* Hover/Animation for Cards */
+
+        .stat-card i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .stat-card span {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* --- Main Content Split (Left and Right) --- */
+        .content-split {
+            display: flex;
+            gap: 30px;
+        }
+
+        .content-left {
+            flex: 3;
+            /* Wider column for main content */
+        }
+
+        .content-right {
+            flex: 1.5;
+            /* Narrower column for deadlines/activity */
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        /* --- Course List & Item Styles (Continue Learning) --- */
+        .course-list {
+            margin-bottom: 30px;
+            animation-delay: 3s;
+            animation: course 0.9s ease forwards;
+            background-color: var(--card-bg);
+            border: var(--border);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        /* Course List Animation */
+        @keyframes course {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+                /* Start far below */
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(-15px);
+                /* Bounce up past final position */
+            }
+
+            80% {
+                transform: translateY(5px);
+                /* Bounce down slightly */
+            }
+
+            100% {
+                transform: translateY(0);
+                /* Settle at final position */
+            }
+        }
+
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border: 1px solid #fafafa;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s;
+        }
+
+        .course-item:hover {
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 20px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .course-details {
+            flex-grow: 1;
+        }
+
+        .course-details h3 {
+            margin-bottom: 2px;
+            font-size: 1.1rem;
+        }
+
+        .course-details p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .course-details i {
+            margin-right: 0px;
+            opacity: 0.8;
+            font-weight: 100;
+        }
+
+        .progress-bar-container {
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background-image: var(--potential-color);
+            /* Blue gradient */
+            /* transition: width 0.5s ease-in-out; */
+            animation: fillAnimation 2s ease-out forwards;
+            overflow: hidden;
+            animation-delay: 0.9s;
+            opacity: 0;
+        }
+
+        @keyframes fillAnimation {
+            from {
+                width: 0;
+                opacity: 1;
+            }
+
+            to {
+                width: var(--progress);
+                opacity: 1;
+            }
+        }
+
+        .course-item:nth-child(1) .progress-bar {
+            background-image: var(--potential-color);
+            /* Purple gradient for Math */
+        }
+
+        .continue-btn {
+            background-image: var(--potential-color);
+            color: white;
+            border: none;
+            margin-left: 20px;
+            padding: 10px 18px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .continue-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* The animation when clicking the continue button */
+        .continue-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* --- Right Column Sections (Deadlines, Activity, Achievements) --- */
+        .deadline-item {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border: var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            border-left: 4px solid #dc2626;
+            animation: deadline 0.9s ease forwards;
+        }
+
+        /* Deadline Section Animation */
+        @keyframes deadline {
+            0% {
+                opacity: 0;
+                transform: translateX(50px);
+                /* Start far right */
+            }
+
+            100% {
+                transform: translateX(0);
+                /* Settle at final position */
+            }
+        }
+
+        .deadline-item h3 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .deadline-item p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .deadline-item .date {
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        .deadline-details {
+            background-color: rgb(254 242 242 / var(--opacity, 1));
+            border-radius: var(--border-radius);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Activity and Achievements Sections */
+        .activity-section,
+        .achievements-section {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border: var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        /* Activity/Achievements Animation */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+                /* Start far right */
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+                /* Settle at final position */
+            }
+        }
+
+        .activity-section,
+        .achievements-section {
+            animation: slideInRight 0.9s ease forwards;
+        }
+
+        .rightside:nth-child(2) .activity-section {
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .rightside:nth-child(3) .achievements-section {
+            opacity: 0;
+            animation-delay: 0.5s;
+        }
+
+        .activity-section ul {
+            list-style: none;
+        }
+
+        .activity-section li {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .activity-section li i {
+            color: rgb(22 163 74 / var(--opacity, 1));
+            /* Green for checkmarks */
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        .activity-section li span {
+            margin-left: auto;
+            font-weight: 600;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            height: 60px;
+            margin-bottom: 5px;
+            background-color: rgb(240 253 244 / var(--opacity, 1));
+        }
+
+        .achievement-item i {
+            color: rgb(22 163 74 / var(--opacity, 1));
+        }
+
+        #icon {
+            float: right;
+            color: var(--text-light);
+        }
+
+        .achievement-item .badge {
+            font-size: 1rem;
+            margin-right: 15px;
+        }
+
+        .achievement-text h3 {
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .achievement-text p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* --- Learning Progress Chart (Placeholder) --- */
+        .learning-progress {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border: var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            animation: chart 0.9s ease forwards;
+        }
+
+        /*Learning Progress Chart Animation */
+        @keyframes chart {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+                /* Start far below */
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                /* Settle at final position */
+            }
+        }
+
+        .weekly-time {
+            float: right;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .progress-chart {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin: 16px 0 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            height: 8rem;
+            align-items: flex-end;
+            width: 100%;
+            /* In a real scenario, this is where you'd add bar charts */
+        }
+
+
+        .chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 30px;
+            position: relative;
+        }
+
+        /* --- Day labels on top --- */
+        .day {
+            position: absolute;
+            top: 0;
+            transform: translateY(-10px);
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+            width: 50px;
+            text-align: center;
+        }
+
+        .bar-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            width: 50px;
+            height: 8rem;
+            margin-bottom: 20px;
+        }
+
+        .bar {
+            margin-top: 20px;
+            width: 25px;
+            border-radius: 5px 5px 0 0;
+            background: linear-gradient(to top, var(--primary-color), var(--secondary-color));
+            position: relative;
+            animation: grow 1.2s ease forwards;
+            transform-origin: bottom;
+        }
+
+        .bar::after {
+            content: attr(data-value);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #555;
+            font-size: 0.9em;
+            font-weight: 300;
+        }
+
+        /* --- Bar Animation --- */
+        @keyframes grow {
+            from {
+                height: 0;
+                opacity: 0.2;
+            }
+
+            to {
+                height: var(--bar-height);
+                opacity: 1;
+            }
+        }
+
+        /* Sequential animation delay */
+        .bar-wrapper:nth-child(1) .bar {
+            animation-delay: 0s;
+        }
+
+        .bar-wrapper:nth-child(2) .bar {
+            animation-delay: 0.1s;
+        }
+
+        .bar-wrapper:nth-child(3) .bar {
+            animation-delay: 0.2s;
+        }
+
+        .bar-wrapper:nth-child(4) .bar {
+            animation-delay: 0.3s;
+        }
+
+        .bar-wrapper:nth-child(5) .bar {
+            animation-delay: 0.4s;
+        }
+
+        .bar-wrapper:nth-child(6) .bar {
+            animation-delay: 0.5s;
+        }
+
+        .bar-wrapper:nth-child(7) .bar {
+            animation-delay: 0.6s;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgb(10, 9, 9);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .flash {
+            animation: flash-pulse 0.3s ease-in-out;
+        }
+
+        @keyframes flash-pulse {
+            0% {
+                background-color: var(--card-bg);
+            }
+
+            50% {
+                background-color: #e0eaff;
+            }
+
+            /* Light blue flash */
+            100% {
+                background-color: var(--card-bg);
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-book" id="lo"></i> EduPlatform
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="nav-item active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="#" class="nav-item"><i class="fas fa-book"></i> Courses</a>
+                <a href="#" class="nav-item"><i class="fas fa-bar-chart"></i> Schedule</a>
+                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Progress</a>
+                <a href="#" class="nav-item"><i class="fas fa-comment-dots"></i> Messages</a>
+                <a href="#" class="nav-item"><i class="fas fa-certificate"></i> Certificates</a>
+                <a href="#" class="nav-item"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Achievements</a>
+                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+            </nav>
+            <div class="user-info-mobile">{{ student.name }}</div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-nav">
+                    <a href="#">Features</a>
+                    <a href="#">Courses</a>
+                    <a href="#">Reviews</a>
+                    <a href="#">Pricing</a>
+                </div>
+                <div class="user-profile">
+                    <span>{{ student.name }}</span>
+                    <img src="https://ui-avatars.com/api/?name={{ student.name }}" alt="">
+                    <div class="logout">
+                        <a href="{% url 'mainpage' %}" title="logout"><i class="fas fa-sign-out-alt"></i></a>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-overview">
+                <div class="welcome-banner">
+                    <h1>Welcome back, {{ student.name }}! 👋</h1>
+                    <p>Ready to continue your learning journey?</p>
+                </div>
+
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <i class="fas fa-layer-group"></i>
+                        <p>3</p>
+                        <span>Courses</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-signal"></i>
+                        <p>68%</p>
+                        <span>Progress</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <p>12h</p>
+                        <span>Study Time</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <p>2</p>
+                        <span>Certificates</span>
+                    </div>
+                </div>
+
+                <div class="content-split">
+                    <div class="content-left">
+                        <div class="course-list">
+                            <h2>Continue Learning</h2>
+                            <div class="course-item">
+                                <img src="https://images.pexels.com/photos/220301/pexels-photo-220301.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
+                                    alt="Advanced Mathematics">
+                                <div class="course-details">
+                                    <h3>Advanced Mathematics</h3>
+                                    <p><i class="fas fa-clock"></i> 12 weeks | <i class="fas fa-bar-chart"></i> 68%
+                                        complete</p>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-fill" style="--progress:68%"></div>
+                                    </div>
+                                </div>
+                                <button class="continue-btn">Continue ❯</button>
+                            </div>
+
+                            <div class="course-item">
+                                <img src="https://media.istockphoto.com/id/874157664/photo/classroom-desk-and-drawn-blackboard-of-chemistry-teaching-general-view.jpg?s=612x612&w=0&k=20&c=-aGthcskbfFUxS3Ta6nIpaEFWmgLkqeRvIZntnMMcIA="
+                                    alt="Physics Fundamentals">
+                                <div class="course-details">
+                                    <h3>Physics Fundamentals</h3>
+                                    <p><i class="fas fa-clock"></i> 10 weeks | <i class="fas fa-bar-chart"></i> 42%
+                                        complete</p>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-fill" style="--progress:42%"></div>
+                                    </div>
+                                </div>
+                                <button class="continue-btn">Continue ❯</button>
+                            </div>
+                        </div>
+
+                        <div class="learning-progress">
+                            <h2>Learning Progress</h2>
+                            <p>Weekly Study Pattern <span class="weekly-time">20.31 h</span></p>
+                            <div class="chart">
+
+                                <div class="bar-wrapper">
+                                    <div class="day">Mon</div>
+                                    <div class="bar" style="--bar-height: 60px;" data-value="2.5h"></div>
+                                </div>
+
+                                <div class="bar-wrapper">
+                                    <div class="day">Tue</div>
+                                    <div class="bar" style="--bar-height: 90px;" data-value="3.2h"></div>
+                                </div>
+
+                                <div class="bar-wrapper">
+                                    <div class="day">Wed</div>
+                                    <div class="bar" style="--bar-height: 50px;" data-value="1.8h"></div>
+                                </div>
+
+                                <div class="bar-wrapper">
+                                    <div class="day">Thu</div>
+                                    <div class="bar" style="--bar-height: 115px;" data-value="4.1h"></div>
+                                </div>
+
+                                <div class="bar-wrapper">
+                                    <div class="day">Fri</div>
+                                    <div class="bar" style="--bar-height: 80px;" data-value="2.9h"></div>
+                                </div>
+
+                                <div class="bar-wrapper">
+                                    <div class="day">Sat</div>
+                                    <div class="bar" style="--bar-height: 105px;" data-value="3.7h"></div>
+                                </div>
+
+                                <div class="bar-wrapper">
+                                    <div class="day">Sun</div>
+                                    <div class="bar" style="--bar-height: 65px;" data-value="2.1h"></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-right">
+                        <div class="rightside">
+                            <div class="deadline-item">
+                                <h2>Upcoming Deadlines <i class="fas fa-calendar-alt" id="icon"></i></h2>
+                                <div class="deadline-details">
+                                    <h3>Calculus Problem Set</h3>
+                                    <p>Advanced Mathematics</p>
+                                    <span class="date">22/10/2025</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rightside">
+                            <div class="activity-section">
+                                <h2>Recent Activity<i class="fas fa-bell" id="icon"></i></h2>
+                                <ul>
+                                    <li><i class="fas fa-check-circle"></i> Completed "Derivatives and Applications"
+                                        <span>05/10/2025</span>
+                                    </li>
+                                    <li><i class="fas fa-file-alt"></i> Literature Essay graded <span>29/09/2025</span>
+                                    </li>
+                                    <li><i class="fas fa-check-circle"></i> Submitted Physics Quiz #3
+                                        <span>28/08/2025</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="rightside">
+                            <div class="achievements-section">
+                                <h2>Recent Achievements<i class="fas fa-trophy" id="icon"></i></h2>
+                                <div class="achievement-item">
+                                    <span class="badge"><i class="fas fa-trophy"></i></span>
+                                    <div class="achievement-text">
+                                        <h3>Math Master</h3>
+                                        <p>Completed calculus module</p>
+                                    </div>
+                                </div>
+
+                                <div class="achievement-item">
+                                    <span class="badge"><i class="fas fa-trophy"></i></span>
+                                    <div class="achievement-text">
+                                        <h3>Perfect Score</h3>
+                                        <p>Aced the physics quiz</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all clickable elements that need the "pop" animation
+            const clickableElements = document.querySelectorAll('.continue-btn, .nav-item, .stat-card');
+
+            clickableElements.forEach(element => {
+                // Add a temporary class on click to trigger the CSS animation
+                element.addEventListener('mousedown', () => {
+                    element.classList.add('is-clicked');
+                });
+
+                element.addEventListener('mouseup', () => {
+                    // Remove the class after a short delay to reset for the next click
+                    setTimeout(() => {
+                        element.classList.remove('is-clicked');
+                    }, 100);
+                });
+            });
+
+            // Add a specific animation class for the stat cards when clicked
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.add('flash');
+                    setTimeout(() => {
+                        card.classList.remove('flash');
+                    }, 300);
+                });
+            });
+        });
+
+    </script>
+</body>
+
+</html>

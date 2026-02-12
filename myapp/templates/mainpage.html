@@ -1,0 +1,413 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'myapp/image/icon.png' %}" type="image/x-icon">
+    <title>EduPlatform⭐💫✨</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo-container">
+                <div class="icon">
+                    <a href="#" title="Home"><i class="ri-book-open-line" id="lo"></i></a>
+                </div>
+                <div class="logo">
+                    <a href="#">
+                        <h1 class="top">EDU</h1>
+                    </a>
+                    <a href="#">
+                        <h1 class="bottom">PLATEFORM</h1>
+                    </a>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#courses">Courses</a>
+                <a href="#reviews">Reviews</a>
+                <a href="#pricing">Pricing</a>
+            </nav>
+            <div class="nav-right">
+                <i class="ri-menu-line" id="menu-icon"></i>
+                <a href="{% url 'login' %}"><button class="btn btn-primary">Get Started</button></a>
+            </div>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <p class="goal-achieved">
+                        <i class="ri-trophy-line"></i>
+                        Trusted by 250k+ learners
+                    </p>
+                    <h1>Unlock Your
+                        <span id="Potential">Potential</span>
+                    </h1>
+                    <p>Master in-demand skills with personalized learning paths, expert instructors, and AI-powered
+                        recommendations. Get certified and advance your career.</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-secondary">Start Free Trial</button>
+                        <button class="btn btn-outline">
+                            <i class="ri-play-circle-fill"></i>
+                            Watch Demo
+                        </button>
+                    </div>
+                    <div class="user-stats">
+                        <div class="user-avatars">
+                            <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&fit=crop&seed=4"
+                                alt="User Avatar">
+                            <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&fit=crop&seed=4"
+                                alt="User Avatar">
+                            <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&fit=crop&seed=4"
+                                alt="User Avatar">
+                        </div>
+                        <span>250k+ active learners</span>
+                        <div class="rating">
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-half-fill"></i>
+                            <span>4.9/5 rating</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image-card">
+                    <div class="card">
+                        <div class="goal-tag">
+                            🎯 Goal Achieved!
+                        </div>
+                        <img src="https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
+                            alt="Interactive Learning">
+                        <div class="card-header">
+                            <i class="ri-book-open-line"></i>
+                            <span>Interactive Learning</span>
+                        </div>
+                        <p>Hands-on projects & real-world applications</p>
+                        <div class="progress-bar">
+                            <span>Course Progress:</span>
+                            <span class="progress-percentage">68%</span>
+                            <div class="progress-container">
+                                <div class="progress-fill" style="--progress: 68%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="new-lesson-tag">
+                        📚 New Lesson Available
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <div class="container">
+                <div class="headpara-card ">
+                    <h2>Why Choose Our Platform?</h2>
+                    <p>Experience the future of education with cutting-edge features designed to accelerate your
+                        learning journey.</p>
+                </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="ri-chat-3-line icon"></i>
+                        <h3>AI-Powered Learning Paths</h3>
+                        <p>Personalized curriculum that adapts to your learning style and pace for optimal results.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="ri-vidicon-line icon"></i>
+                        <h3>Live Expert Tutors</h3>
+                        <p>Get instant help from certified instructors during live sessions and Q&A periods.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="ri-time-line icon"></i>
+                        <h3>Learn at Your Own Pace</h3>
+                        <p>Flexible scheduling that fits your lifestyle with 24/7 access to course materials.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="ri-award-line icon"></i>
+                        <h3>Industry Certifications</h3>
+                        <p>Earn recognized certificates that boost your resume and career prospects.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="ri-chat-1-line icon"></i>
+                        <h3>Interactive Discussions</h3>
+                        <p>Collaborate with peers, ask questions, and participate in vibrant learning communities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="ri-bar-chart-box-line icon"></i>
+                        <h3>Progress Analytics</h3>
+                        <p>Detailed insights and performance tracking for students and parents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="courses" class="courses-section">
+            <div class="container">
+                <div class="headpara-card">
+                    <h2>Explore Our Courses</h2>
+                    <p>Discover thousands of courses across multiple subjects, all taught by industry experts.</p>
+                    <div class="search-box">
+                        <i class="ri-search-line"></i>
+                        <input type="text" placeholder="Search for courses, subjects...">
+                    </div>
+                </div>
+                <div class="course-list">
+                    <div class="course-card">
+                        <span class="course-level">Advanced</span>
+                        <img src="https://images.pexels.com/photos/220301/pexels-photo-220301.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
+                            alt="Advanced Mathematics">
+                        <div class="course-info">
+                            <h3>Advanced Mathematics</h3>
+                            <p>Master calculus, algebra, and advanced mathematical concepts with interactive lessons.
+                            </p>
+                            <div class="course-stats">
+                                <div class="rating">
+                                    <i class="ri-star-fill"></i>
+                                    <span>4.8 (15,420)</span>
+                                </div>
+                                <div class="duration">
+                                    <i class="ri-time-line"></i>
+                                    <span>12 weeks</span>
+                                </div>
+                            </div>
+                            <div class="course-meta">
+                                <span>by Dr. Maria Rodriguez</span>
+                                <span>₹ 1999</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'login' %}"><button class="btn btn-primary">Enroll Now</button></a>
+                    </div>
+
+                    <div class="course-card">
+                        <span class="course-level">Intermediate</span>
+                        <img src="https://media.istockphoto.com/id/874157664/photo/classroom-desk-and-drawn-blackboard-of-chemistry-teaching-general-view.jpg?s=612x612&w=0&k=20&c=-aGthcskbfFUxS3Ta6nIpaEFWmgLkqeRvIZntnMMcIA="
+                            alt="Physics Fundamentals">
+                        <div class="course-info">
+                            <h3>Physics Fundamentals</h3>
+                            <p>Explore the fundamental principles of physics through experiments and simulations.</p>
+                            <div class="course-stats">
+                                <div class="rating">
+                                    <i class="ri-star-fill"></i>
+                                    <span>4.7 (12,860)</span>
+                                </div>
+                                <div class="duration">
+                                    <i class="ri-time-line"></i>
+                                    <span>12 weeks</span>
+                                </div>
+                            </div>
+                            <div class="course-meta">
+                                <span>by Prof. James Chen</span>
+                                <span>₹ 1999</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'login' %}"><button class="btn btn-primary">Enroll Now</button></a>
+                    </div>
+
+                    <div class="course-card">
+                        <span class="course-level">Intermediate</span>
+                        <img src="https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
+                            alt="Advanced Mathematics">
+                        <div class="course-info">
+                            <h3>English Literature</h3>
+                            <p>Dive deep into classic and contemporary world literature with expert analysis, critical
+                                perspectives, and engaging discussions.</p>
+                            <div class="course-stats">
+                                <div class="rating">
+                                    <i class="ri-star-fill"></i>
+                                    <span>4.6 (13,530)</span>
+                                </div>
+                                <div class="duration">
+                                    <i class="ri-time-line"></i>
+                                    <span>8 weeks</span>
+                                </div>
+                            </div>
+                            <div class="course-meta">
+                                <span>by Ms. Emily Watson</span>
+                                <span>₹ 1999</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'login' %}"><button class="btn btn-primary">Enroll Now</button></a>
+                    </div>
+                </div>
+                <button class="btn btn-outline view-all-btn">View All Courses</button>
+            </div>
+        </section>
+
+        <section id="reviews" class="reviews-section">
+            <div class="container">
+                <div class="headpara-card">
+                    <h2>What Our Community Says</h2>
+                    <p>Join thousands of successful learners who have transformed their careers and academic
+                        performance.</p>
+                </div>
+                <div class="testimonial-grid">
+                    <div class="testimonial-card">
+                        <p class="quote">"This platform transformed my learning experience. The interactive lessons and
+                            personalized feedback helped me improve my grades significantly."</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&fit=crop"
+                                alt="Emma Wilson">
+                            <div>
+                                <h4>Emma Wilson</h4>
+                                <p>Student</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="quote">"As a parent, I love being able to track my child's progress. The detailed
+                            reports help me understand where they need support."</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&fit=crop"
+                                alt="Michael Chen">
+                            <div>
+                                <h4>Michael Chen</h4>
+                                <p>Parent</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="quote">"The live tutoring sessions are amazing! Getting instant help when I'm stuck
+                            has made such a difference in my understanding."</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&fit=crop"
+                                alt="Sofia Rodriguez">
+                            <div>
+                                <h4>Sofia Rodriguez</h4>
+                                <p>Student</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h2>1M+</h2>
+                            <p>Active Students</p>
+                        </div>
+                        <div class="stat-item">
+                            <h2>98%</h2>
+                            <p>Completion Rate</p>
+                        </div>
+                        <div class="stat-item">
+                            <h2>10K+</h2>
+                            <p>Courses Available</p>
+                        </div>
+                        <div class="stat-item">
+                            <h2>4.9/5</h2>
+                            <p>Average Rating</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="hero-footer">
+            <div class="footer">
+                <h2><strong>Ready to Transform Your Learning?</strong></h2>
+                <p class="note-footer">Join over 1 million students who have already accelerated their careers and
+                    academic success with our platform.</p>
+
+                <div class="features-footer">
+                    <div class="feature-div">Access to 10,000+ premium courses</div>
+                    <div class="feature-div">Personal AI-powered learning assistant</div>
+                    <div class="feature-div">Live sessions with expert instructors</div>
+                    <div class="feature-div">Industry-recognized certifications</div>
+                    <div class="feature-div">Progress tracking for parents</div>
+                    <div class="feature-div">30-day money-back guarantee</div>
+                </div>
+
+                <div class="cta">
+                    <input type="email" placeholder="Enter your email">
+                    <a href="#"><button role="button">Watch Demo</button></a>
+                </div>
+
+                <!--  -->
+                <p class="note-footer">No credit card required • Cancel anytime • Start learning in under 60 seconds</p>
+                <div class="container footer-grid">
+                    <div class="footer-col brand-col">
+                        <div class="logo-container-footer">
+                            <div class="icon">
+                                <a href="#" title="Home"><i class="ri-book-open-line" id="lo"></i></a>
+                            </div>
+                            <div class="logo-footer">
+                                <a href="#">
+                                    <h1 class="top">EDU</h1>
+                                </a>
+                                <a href="#">
+                                    <h1 class="bottom">PLATEFORM</h1>
+                                </a>
+                            </div>
+                        </div>
+                        <p>Unlock your potential with personalized learning paths and expert instruction.</p>
+                        <div class="social-links">
+                            <a href="#" aria-label="LinkedIn"><i class="ri-linkedin-box-fill"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="ri-twitter-fill"></i></a>
+                            <a href="#" aria-label="Facebook"><i class="ri-facebook-box-fill"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="ri-instagram-fill"></i></a>
+                            <a href="#" aria-label="YouTube"><i class="ri-youtube-fill"></i></a>
+                            <a href="#" aria-label="GitHub"><i class="ri-github-fill"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4>Courses</h4>
+                        <ul>
+                            <li><a href="#">Data Science</a></li>
+                            <li><a href="#">Web Development</a></li>
+                            <li><a href="#">Physics Fundamentals</a></li>
+                            <li><a href="#">English Literature</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="#features">About Us</a></li>
+                            <li><a href="#reviews">Careers</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4>Legal & Support</h4>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Sitemap</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="container">
+                        <p class="copyright-notice">
+                            &copy; 2024 EduPlatform. All rights reserved.
+                        </p>
+                        <div class="payment-methods">
+                            <i class="ri-visa-fill"></i>
+                            <i class="ri-mastercard-fill"></i>
+                            <i class="ri-paypal-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'myapp/js/script.js' %}"></script>
+</body>
+
+</html>

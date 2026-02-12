@@ -1,0 +1,470 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'myapp/image/icon.png' %}" type="image/x-icon">
+    <title>Login - EduPlatfrom⭐💫✨</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* General Body and Container Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* A modern, clean font like the image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8faff;
+            /* Light background to match EduPlatfrom theme */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Logo and Heading */
+        .login-container .logo-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            color: #4A4AFB;
+            /* Primary brand color from the image */
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .login-container .logo-brand svg {
+            margin-right: 10px;
+            fill: #4A4AFB;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            /* Added for relative positioning of the eye icon */
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        /* The container for the password input and icon */
+        .password-input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            /* Ensure input is not hidden by the icon wrapper */
+            box-sizing: border-box;
+            /* Added padding-right to prevent text from going under the icon */
+            padding-right: 50px;
+        }
+
+        .form-group input:focus {
+            border-color: #4A4AFB;
+            box-shadow: 0 0 0 3px rgba(74, 74, 251, 0.2);
+            outline: none;
+        }
+
+        /* Styles for the Eye Icon */
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+            font-size: 11px;
+            z-index: 10;
+            /* Ensure it's above the input */
+        }
+
+        .toggle-password:hover {
+            color: #555;
+        }
+
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 25px;
+        }
+
+        .forgot-password a {
+            color: #4A4AFB;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .forgot-password a:hover {
+            color: #3a3ad0;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px 20px;
+            background-color: #4A4AFB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a3ad0;
+            box-shadow: 0 5px 15px rgba(74, 74, 251, 0.3);
+        }
+
+        .signup-link {
+            margin-top: 30px;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #4A4AFB;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .signup-link a:hover {
+            color: #3a3ad0;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            /* overflow: hidden; */
+            height: 35px;
+            background-color: #efefef;
+        }
+
+
+        .tab {
+            flex: 1;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            background: #efefef;
+            margin: 4px;
+            font-size: medium;
+            font-weight: 300;
+            border-radius: 6px;
+            color: #797979;
+        }
+
+        .tab:hover {
+            color: black;
+        }
+
+        .tab.active {
+            background: #ffffff;
+            margin: 3px;
+            font-size: medium;
+            font-weight: 300;
+            border-radius: 6px;
+            color: #4A4AFB;
+        }
+
+        .confirm-message {
+            color: #52c41a;
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            padding: 1px;
+            margin: 0 auto 10px auto;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            /* Hidden by default, shown when there's a confirmation */
+            font-size: 0.9em;
+        }
+
+        .confirm-message p {
+            margin: 5px;
+        }
+
+        .confirm-message p::before {
+            content: "✔";
+            /* Checkmark symbol */
+            font-weight: bold;
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            color: #ff4d4f;
+            background-color: #fff1f0;
+            border: 1px solid #ffa39e;
+            padding: 1px;
+            margin: 0 auto 10px auto;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            /* Hidden by default, shown when there's an error */
+            font-size: 0.9em;
+        }
+
+        .error-message p {
+            margin: 5px;
+        }
+
+
+        .error-message p::before {
+            content: "⚠";
+            /* Warning symbol */
+            font-weight: bold;
+        }
+
+        .error {
+            border-color: #ff4d4f !important;
+            box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.2) !important;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+        }
+
+        #childNameField {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo-brand">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M12 2L2 7V17L12 22L22 17V7L12 2ZM12 4.09L19.49 8.29L12 12.49L4.51 8.29L12 4.09ZM4 10.42L11 14.39V20.11L4 16.29V10.42ZM13 20.11V14.39L20 10.42V16.29L13 20.11Z"
+                    fill="currentColor" />
+            </svg>
+            EduPlatform
+        </div>
+        <h2>Welcome Back!</h2>
+        <form action="" method="POST" id="loginForm" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="user_type" id="user_type" value="student">
+            <div class="tabs">
+                <button type="button" id="studentTab" class="tab active">Student</button>
+                <button type="button" id="parentTab" class="tab">Parent</button>
+                <button type="button" id="teacherTab" class="tab">Teacher</button>
+            </div>
+            <div id="error-message" class="error-message">
+                {% if error %}
+                <p>{{ error }}</p>
+                <script>document.getElementById("error-message").style.display = 'block';</script>
+                {% endif %}
+            </div>
+            <div id="confirm-message" class="confirm-message"></div>
+            <div class="form-group" id="childNameField">
+                <label for="name">Child Name</label>
+                <input type="text" id="name" name="name" placeholder="Swaraj" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Enter Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter Username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-input-wrapper">
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+            </div>
+            <div class="forgot-password">
+                <a href="#">Forgot Password?</a>
+            </div>
+            <button type="submit" class="btn-primary" id="loginBtn">Log In</button>
+        </form>
+        <div class="signup-link">
+            Don't have an account? <a href="{% url 'register' %}">Sign Up</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const togglePassword = document.querySelector('#togglePassword');
+            const password = document.querySelector('#password');
+
+            togglePassword.addEventListener('click', function (e) {
+                // Toggle the type attribute
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+
+                // Toggle the eye icon
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+            });
+        });
+
+        const studentTab = document.getElementById("studentTab");
+        const parentTab = document.getElementById("parentTab");
+        const teacherTab = document.getElementById("teacherTab");
+        const childNameField = document.getElementById("childNameField");
+
+        studentTab.addEventListener("click", () => {
+            studentTab.classList.add("active");
+            parentTab.classList.remove("active");
+            teacherTab.classList.remove("active");
+            childNameField.style.display = "none"; // Hide child name
+            document.getElementById("user_type").value = "student";
+            document.getElementById("loginForm").reset();
+            document.getElementById("user_type").value = "student";
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+            document.getElementById("name").classList.remove("error");
+            document.getElementById("username").classList.remove("error");
+            document.getElementById("password").classList.remove("error");
+        });
+
+        parentTab.addEventListener("click", () => {
+            parentTab.classList.add("active");
+            studentTab.classList.remove("active");
+            teacherTab.classList.remove("active");
+            childNameField.style.display = "block"; // Show child name
+            document.getElementById("user_type").value = "parent";
+            document.getElementById("loginForm").reset();
+            document.getElementById("user_type").value = "parent";
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+            document.getElementById("name").classList.remove("error");
+            document.getElementById("username").classList.remove("error");
+            document.getElementById("password").classList.remove("error");
+        });
+
+        teacherTab.addEventListener("click", () => {
+            teacherTab.classList.add("active");
+            studentTab.classList.remove("active");
+            parentTab.classList.remove("active");
+            childNameField.style.display = "none"; // Hide child name
+            document.getElementById("user_type").value = "teacher";
+            document.getElementById("loginForm").reset();
+            document.getElementById("user_type").value = "teacher";
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+            document.getElementById("name").classList.remove("error");
+            document.getElementById("username").classList.remove("error");
+            document.getElementById("password").classList.remove("error");
+        });
+
+        // We are removing the submit interceptor or updating it to just validate and then let it submit
+        document.getElementById("loginForm").addEventListener("submit", function (event) {
+            // event.preventDefault(); // Remove this to allow actual submission
+
+            // Hide previous messages
+            // document.getElementById("error-message").style.display = 'none';
+            document.getElementById("confirm-message").style.display = 'none';
+
+            const name = document.getElementById("name");
+            const username = document.getElementById("username");
+            const password = document.getElementById("password");
+
+            // Reset error styles
+            name.classList.remove("error");
+            username.classList.remove("error");
+            password.classList.remove("error");
+
+            let isValid = true;
+            let errorMsg = "";
+
+            // Check if student or parent
+            const isStudent = studentTab.classList.contains("active");
+            const isTeacher = teacherTab.classList.contains("active");
+
+            // Ignore child name validation for login as we only use username/password in backend
+            /*
+            if (!isStudent && !isTeacher && !name.value.trim()) {
+                name.classList.add("error");
+                isValid = false;
+                errorMsg += "Child Name is required for parents. ";
+            }
+            */
+
+            if (!password.value) {
+                password.classList.add("error");
+                isValid = false;
+                errorMsg += "Password is required. ";
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // Stop if invalid client side
+                document.getElementById("error-message").innerHTML = "<p> " + errorMsg + "</p>";
+                document.getElementById("error-message").style.display = 'block';
+            }
+        });
+
+    </script>
+</body>
+
+</html>

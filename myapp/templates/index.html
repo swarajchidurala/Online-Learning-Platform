@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'myapp/image/icon.png' %}" type="image/x-icon">
+    <title>EduPlateform ⭐💫✨</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'GcEpicPro', sans-serif;
+        }
+
+        @font-face {
+            font-family: 'GcEpicPro';
+            src: url('{% static "myapp/font/GC-EPICPRO-Demo-BF6891cc5419ab8.ttf" %}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+            /* Improve loading performance */
+        }
+
+        /* Splash container */
+        .splash {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        /* Icon */
+        #lo {
+            color: #2961eb;
+            font-size: 16vw;
+            line-height: 0.8;
+            display: flex;
+            align-items: center;
+            animation: scaleUp 1s ease-in-out;
+        }
+
+        /* Text */
+        .logo {
+            text-align: left;
+            line-height: 0.8;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .logo h1 {
+            color: #000000;
+            font-weight: 900;
+            font-size: 8vw;
+            font-family: 'GcEpicPro';
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Fade-out effect before redirect */
+        .fade-out {
+            animation: fadeOut 1s ease-out forwards;
+            /* animation-duration: 2s; */
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+
+        @media screen {
+            .splash {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="splash" id="splash">
+        <i class="ri-book-open-line" id="lo"></i>
+        <div class="logo">
+            <h1 class="top">EDU</h1>
+            <h1 class="bottom">PLATEFORM</h1>
+        </div>
+    </div>
+
+    <script>
+        // Wait 2 seconds, then fade out and open main page
+        setTimeout(() => {
+            document.getElementById("splash").classList.add("fade-out");
+        }, 1800); // start fade-out after 1.8s
+
+        // After fade-out completes, redirect to main page
+        setTimeout(() => {
+            window.location.href = "{% url 'mainpage' %}"; // Redirect to main_page view
+        }, 2800); // 2.8 seconds total
+    </script>
+</body>
+
+</html>

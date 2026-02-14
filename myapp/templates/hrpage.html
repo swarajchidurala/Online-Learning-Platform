@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/static/myapp/image/icon.png" type="image/x-icon">
+    <title>HR Dashboard - EduPlatform</title>
+    <!-- Fonts and Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- Global Reset & Variables (Matched with tchrpage.html) --- */
+        :root {
+            --primary-color: #2961eb;
+            --secondary-color: #6a63d7;
+            --bg-light: #f4f7f9;
+            --text-dark: #333;
+            --text-light: #666;
+            --card-bg: #fff;
+            --border-radius: 12px;
+            --potential-color: linear-gradient(90deg, #2961eb, #8f34ea);
+            --border: 1px solid #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* --- Dashboard Layout --- */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar Styles --- */
+        .sidebar {
+            position: fixed;
+            width: 250px;
+            height: 100vh;
+            padding: 30px 20px;
+            background: var(--card-bg);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.9s ease forwards;
+            z-index: 100;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-90px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .logo {
+            margin: 0 auto 40px auto;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: #f0f3f5;
+            color: var(--primary-color);
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            color: white;
+            box-shadow: 0 4px 8px rgba(91, 84, 168, 0.4);
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 0 30px 30px 30px;
+            margin-left: 250px;
+            overflow-y: auto;
+        }
+
+        /* --- Header Styles --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            position: fixed;
+            z-index: 90;
+            align-items: center;
+            padding: 20px 20px;
+            margin-bottom: 20px;
+            height: 64px;
+            width: calc(100% - 310px);
+            /* Adjusted for sidebar + padding */
+            border-radius: 0 0 12px 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            animation: bounceIn 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(15px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-left: 10px;
+            border: 2px solid var(--primary-color);
+        }
+
+        /* --- Content Sections --- */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+            margin-top: 80px;
+            /* Space for fixed header */
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Welcome Banner --- */
+        .welcome-banner {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: 0 8px 15px rgba(91, 84, 168, 0.4);
+        }
+
+        .welcome-banner h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        /* --- Cards & Grids --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: var(--border);
+            transition: transform 0.2s;
+        }
+
+        .card h3 {
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        /* --- Forms --- */
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+        /* --- Candidate List & Filter --- */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .candidate-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .candidate-item:hover {
+            transform: translateX(5px);
+            border-color: var(--primary-color);
+        }
+
+        .candidate-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .candidate-info {
+            flex: 1;
+        }
+
+        .candidate-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .candidate-role {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .skills-tag {
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
+        /* --- Student Detail View --- */
+        .student-detail-container {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-header {
+            background: linear-gradient(to right, #2961eb, #6a63d7);
+            padding: 30px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-right: 20px;
+        }
+
+        .detail-body {
+            padding: 30px;
+        }
+
+        .detail-section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-briefcase"></i> HR Portal
+            </div>
+
+            <div class="nav-item active" onclick="showSection('dashboard', this)">
+                <i class="fas fa-th-large"></i> Dashboard
+            </div>
+            <div class="nav-item" onclick="showSection('post-job', this)">
+                <i class="fas fa-briefcase"></i> Post Job
+            </div>
+            <div class="nav-item" onclick="showSection('post-project', this)">
+                <i class="fas fa-project-diagram"></i> Post Project
+            </div>
+            <div class="nav-item" onclick="showSection('candidates', this)">
+                <i class="fas fa-search"></i>&NonBreakingSpace;Find Candidates
+            </div>
+
+            <a href="/login/" class="nav-item" style="margin-top: auto; color: #dc2626;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>HR Dashboard</h2>
+                <div class="user-profile">
+                    <span>HR Manager</span>
+                    <img src="https://ui-avatars.com/api/?name=HR+Manager&background=random" alt="Profile">
+                </div>
+            </div>
+
+            <!-- 1. Dashboard View -->
+            <div id="dashboard" class="content-section active">
+                <div class="welcome-banner">
+                    <h1>Welcome, HR Manager! 🚀</h1>
+                    <p>Manage job postings, track candidates, and discover top talent.</p>
+                </div>
+
+                <div class="grid-container">
+                    <div class="card stat-card">
+                        <i class="fas fa-briefcase"></i>
+                        <div class="number">12</div>
+                        <p>Active Job Postings</p>
+                    </div>
+                    <div class="card stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="number">450</div>
+                        <p>Total Candidates</p>
+                    </div>
+                    <div class="card stat-card">
+                        <i class="fas fa-star"></i>
+                        <div class="number">28</div>
+                        <p>Top Performers</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 20px;">Top Performing Students</h3>
+                <div class="card">
+                    <div class="candidate-item"
+                        onclick="showStudentDetail('John Doe', 'Data Science Strategy', '98%', ['Python', 'SQL', 'ML'])">
+                        <div class="candidate-avatar">JD</div>
+                        <div class="candidate-info">
+                            <div class="candidate-name">John Doe</div>
+                            <div class="candidate-role">Full Stack Developer</div>
+                            <div style="margin-top: 5px;">
+                                <span class="skills-tag">Python</span>
+                                <span class="skills-tag">Django</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: var(--primary-color); font-weight: bold;">98% Score</div>
+                            <small>5 Certificates</small>
+                        </div>
+                    </div>
+
+                    <div class="candidate-item"
+                        onclick="showStudentDetail('Alice Smith', 'UI/UX Design', '95%', ['Figma', 'CSS', 'React'])">
+                        <div class="candidate-avatar" style="background: #fce7f3; color: #be185d;">AS</div>
+                        <div class="candidate-info">
+                            <div class="candidate-name">Alice Smith</div>
+                            <div class="candidate-role">UI/UX Designer</div>
+                            <div style="margin-top: 5px;">
+                                <span class="skills-tag">Figma</span>
+                                <span class="skills-tag">React</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: var(--primary-color); font-weight: bold;">95% Score</div>
+                            <small>3 Certificates</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Post Job View -->
+            <div id="post-job" class="content-section">
+                <h2 style="margin-bottom: 20px;">Post a New Job Opening</h2>
+                <div class="card" style="max-width: 800px;">
+                    <form>
+                        <label>Job Title</label>
+                        <input type="text" class="form-control" placeholder="e.g. Software Engineer Intern">
+
+                        <label>Department</label>
+                        <select class="form-control">
+                            <option>Engineering</option>
+                            <option>Design</option>
+                            <option>Marketing</option>
+                        </select>
+
+                        <label>Location</label>
+                        <input type="text" class="form-control" placeholder="e.g. Remote / New York">
+
+                        <label>Job Description</label>
+                        <textarea class="form-control" rows="5" placeholder="Enter job details..."></textarea>
+
+                        <label>Required Skills</label>
+                        <input type="text" class="form-control" placeholder="e.g. Python, Java, Communication">
+
+                        <button class="btn-primary">Post Job</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 3. Post Project View -->
+            <div id="post-project" class="content-section">
+                <h2 style="margin-bottom: 20px;">Post Real-World Mini Project</h2>
+                <div class="card" style="max-width: 800px;">
+                    <form>
+                        <label>Project Title</label>
+                        <input type="text" class="form-control" placeholder="e.g. Build an E-commerce API">
+
+                        <label>Problem Statement</label>
+                        <textarea class="form-control" rows="4"
+                            placeholder="Describe the real-world problem..."></textarea>
+
+                        <label>Difficulty Level</label>
+                        <select class="form-control">
+                            <option>Beginner</option>
+                            <option>Intermediate</option>
+                            <option>Advanced</option>
+                        </select>
+
+                        <label>Key Deliverables</label>
+                        <input type="text" class="form-control" placeholder="e.g. Source Code, Documentation">
+
+                        <button class="btn-primary">Post Project</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 4. Find Candidates View -->
+            <div id="candidates" class="content-section">
+                <h2 style="margin-bottom: 20px;">Find Candidates</h2>
+
+                <div class="filter-bar">
+                    <select class="form-control" style="margin-bottom: 0;">
+                        <option>Filter by Skill</option>
+                        <option>Python</option>
+                        <option>Java</option>
+                        <option>Design</option>
+                    </select>
+                    <select class="form-control" style="margin-bottom: 0;">
+                        <option>Sort by Rating</option>
+                        <option>High to Low</option>
+                        <option>Low to High</option>
+                    </select>
+                    <input type="text" class="form-control" placeholder="Search by name..." style="margin-bottom: 0;">
+                </div>
+
+                <div class="candidate-item"
+                    onclick="showStudentDetail('Michael Scott', 'Sales Expert', '88%', ['Sales', 'Management'])">
+                    <div class="candidate-avatar">MS</div>
+                    <div class="candidate-info">
+                        <div class="candidate-name">Michael Scott</div>
+                        <div class="candidate-role">Regional Manager</div>
+                        <div><span class="skills-tag">Management</span> <span class="skills-tag">Sales</span></div>
+                    </div>
+                </div>
+                <div class="candidate-item"
+                    onclick="showStudentDetail('Pam Beesly', 'Office Admin', '92%', ['Admin', 'Art'])">
+                    <div class="candidate-avatar" style="background: #eef2ff; color: #4338ca;">PB</div>
+                    <div class="candidate-info">
+                        <div class="candidate-name">Pam Beesly</div>
+                        <div class="candidate-role">Administrator</div>
+                        <div><span class="skills-tag">Communication</span> <span class="skills-tag">Organization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Student Detail View (Dynamic) -->
+            <div id="student-detail" class="content-section">
+                <button onclick="showSection('candidates')"
+                    style="margin-bottom: 20px; border: none; background: none; color: var(--primary-color); cursor: pointer; font-size: 1rem;">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </button>
+
+                <div class="student-detail-container">
+                    <div class="detail-header">
+                        <img src="https://ui-avatars.com/api/?name=User&background=random" id="detail-img"
+                            class="detail-avatar">
+                        <div>
+                            <h1 id="detail-name" style="margin: 0;">Student Name</h1>
+                            <p id="detail-role" style="opacity: 0.9;">Role / Title</p>
+                        </div>
+                        <div style="margin-left: auto;">
+                            <button class="btn-primary"
+                                style="background: white; color: var(--primary-color); width: auto;"><i
+                                    class="fas fa-envelope"></i> Contact Candidate</button>
+                        </div>
+                    </div>
+                    <div class="detail-body">
+                        <div class="grid-container">
+                            <div>
+                                <div class="detail-section-title">Performance</div>
+                                <p><strong>Overall Score:</strong> <span id="detail-score"
+                                        style="color: #22c55e; font-weight: bold; font-size: 1.2rem;">95%</span></p>
+                                <p><strong>Rank:</strong> Top 5%</p>
+                                <p><strong>Projects Completed:</strong> 12</p>
+                            </div>
+                            <div>
+                                <div class="detail-section-title">Skills</div>
+                                <div id="detail-skills">
+                                    <span class="skills-tag">Python</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section-title">About</div>
+                        <p>Detailed performance analytics and project portfolio would appear here. This student has
+                            consistently demonstrated excellence in their field of study.</p>
+
+                        <div class="detail-section-title">Certificates</div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                                <i class="fas fa-certificate" style="color: gold;"></i> Advanced Web Development
+                            </div>
+                            <div style="border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                                <i class="fas fa-certificate" style="color: gold;"></i> Data Science Fundamentals
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+
+            // Show target section
+            if (sectionId === 'student-detail') {
+                document.getElementById(sectionId).classList.add('active');
+                // Don't change sidebar for detail view
+                return;
+            }
+
+            document.getElementById(sectionId).classList.add('active');
+
+            // Highlight sidebar item if an element was clicked
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+            } else if (sectionId === 'candidates') {
+                // Try to highlight relevant sidebar item manually if coming from back button
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(el => el.classList.remove('active'));
+                // Assuming 4th item is Candidates
+                if (navItems[3]) navItems[3].classList.add('active');
+            }
+        }
+
+        function showStudentDetail(name, role, score, skills) {
+            // Populate data
+            document.getElementById('detail-name').innerText = name;
+            document.getElementById('detail-img').src = `https://ui-avatars.com/api/?name=${name}&background=random`;
+            document.getElementById('detail-role').innerText = role;
+            document.getElementById('detail-score').innerText = score;
+
+            const skillsContainer = document.getElementById('detail-skills');
+            skillsContainer.innerHTML = '';
+            skills.forEach(skill => {
+                const span = document.createElement('span');
+                span.className = 'skills-tag';
+                span.innerText = skill;
+                skillsContainer.appendChild(span);
+            });
+
+            showSection('student-detail');
+        }
+    </script>
+</body>
+
+</html>

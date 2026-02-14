@@ -9,4 +9,6 @@ urlpatterns = [
     path('stdpage/', views.stdpage, name='stdpage'),
     path('parentpage/', views.parentpage, name='parentpage'),
     path('tchrpage/', views.tchrpage, name='tchrpage'),
+    path('hrpage/', views.hrpage, name='hrpage'),
+    path('chat_api/', views.chat_api, name='chat_api'),
 ]

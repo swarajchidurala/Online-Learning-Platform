@@ -297,6 +297,7 @@
                 <button type="button" id="studentTab" class="tab active">Student</button>
                 <button type="button" id="parentTab" class="tab">Parent</button>
                 <button type="button" id="teacherTab" class="tab">Teacher</button>
+                <button type="button" id="hrTab" class="tab">HR</button>
             </div>
             <div id="error-message" class="error-message"></div>
             <div id="confirm-message" class="confirm-message"></div>
@@ -314,18 +315,39 @@
                 <label for="childname">Child Name</label>
                 <input type="text" id="childname" name="childname" placeholder="Enter your child name">
             </div>
+
+            <!-- HR Fields -->
+            <div id="hrFields" style="display: none;">
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="9876543210">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="company_employee_id">Employe ID</label>
+                        <input type="text" id="company_employee_id" name="company_employee_id" placeholder="EMP123">
+                    </div>
+                </div>
+
+                <div class="form-group" style="flex: 1;">
+                    <label for="company_details">Company Details</label>
+                    <textarea id="company_details" name="company_details"
+                        placeholder="Enter company name and address..."
+                        style="width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: inherit; font-size: 1rem;"></textarea>
+                </div>
+            </div>
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" placeholder="you@example.com">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1;">
                 <label for="password">Password</label>
                 <div class="input-with-icon">
                     <input type="password" id="password" name="password" placeholder="••••••••">
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" style="flex: 1;">
                 <label for="confirm-password">Confirm Password</label>
                 <div class="input-with-icon">
                     <input type="password" id="confirm-password" name="confirm_password" placeholder="••••••••">
@@ -379,69 +401,61 @@
         const studentTab = document.getElementById("studentTab");
         const parentTab = document.getElementById("parentTab");
         const teacherTab = document.getElementById("teacherTab");
-        const childNameField = document.getElementById("childNameField");
-        const userTypeInput = document.getElementById("userTypeInput"); // Wait, I named it user_type in html but variable here? I should use document.getElementById('user_type')
+        const hrTab = document.getElementById("hrTab");
 
-        // Initially, student tab is active, so child name not required
+        const childNameField = document.getElementById("childNameField");
+        const hrFields = document.getElementById("hrFields");
+
+        // Initially, student tab is active
         document.getElementById("childname").required = false;
 
-        studentTab.addEventListener("click", () => {
-            studentTab.classList.add("active");
-            parentTab.classList.remove("active");
-            teacherTab.classList.remove("active");
-            childNameField.style.display = "none"; // Hide child name
-            document.getElementById("user_type").value = "student";
-            document.getElementById("childname").required = false;
+        function resetForm() {
             document.getElementById("registerForm").reset();
-            document.getElementById("user_type").value = "student"; // Reset clears hidden inputs? No usually, but safe to set again.
             document.getElementById("error-message").style.display = 'none';
             document.getElementById("confirm-message").style.display = 'none';
-            document.getElementById("name").classList.remove("error");
-            document.getElementById("username").classList.remove("error");
-            document.getElementById("email").classList.remove("error");
-            document.getElementById("password").classList.remove("error");
-            document.getElementById("childname").classList.remove("error");
-            document.getElementById("confirm-password").classList.remove("error");
+            document.querySelectorAll(".error").forEach(el => el.classList.remove("error"));
+        }
+
+        studentTab.addEventListener("click", () => {
+            resetForm();
+            setActiveTab(studentTab);
+            document.getElementById("user_type").value = "student";
+            childNameField.style.display = "none";
+            hrFields.style.display = "none";
+            document.getElementById("childname").required = false;
         });
 
         parentTab.addEventListener("click", () => {
-            parentTab.classList.add("active");
-            studentTab.classList.remove("active");
-            teacherTab.classList.remove("active");
-            childNameField.style.display = "block"; // Show child name
+            resetForm();
+            setActiveTab(parentTab);
             document.getElementById("user_type").value = "parent";
+            childNameField.style.display = "block";
+            hrFields.style.display = "none";
             document.getElementById("childname").required = true;
-            document.getElementById("registerForm").reset();
-            document.getElementById("user_type").value = "parent";
-            document.getElementById("error-message").style.display = 'none';
-            document.getElementById("confirm-message").style.display = 'none';
-            document.getElementById("name").classList.remove("error");
-            document.getElementById("username").classList.remove("error");
-            document.getElementById("email").classList.remove("error");
-            document.getElementById("password").classList.remove("error");
-            document.getElementById("childname").classList.remove("error");
-            document.getElementById("confirm-password").classList.remove("error");
         });
 
         teacherTab.addEventListener("click", () => {
-            teacherTab.classList.add("active");
-            studentTab.classList.remove("active");
-            parentTab.classList.remove("active");
-            // usernameField.style.display = "block"; // Show username
-            childNameField.style.display = "none"; // Hide child name
+            resetForm();
+            setActiveTab(teacherTab);
             document.getElementById("user_type").value = "teacher";
+            childNameField.style.display = "none";
+            hrFields.style.display = "none";
             document.getElementById("childname").required = false;
-            document.getElementById("registerForm").reset();
-            document.getElementById("user_type").value = "teacher";
-            document.getElementById("error-message").style.display = 'none';
-            document.getElementById("confirm-message").style.display = 'none';
-            document.getElementById("name").classList.remove("error");
-            document.getElementById("username").classList.remove("error");
-            document.getElementById("email").classList.remove("error");
-            document.getElementById("password").classList.remove("error");
-            document.getElementById("childname").classList.remove("error");
-            document.getElementById("confirm-password").classList.remove("error");
         });
+
+        hrTab.addEventListener("click", () => {
+            resetForm();
+            setActiveTab(hrTab);
+            document.getElementById("user_type").value = "hr";
+            childNameField.style.display = "none";
+            hrFields.style.display = "block";
+            document.getElementById("childname").required = false;
+        });
+
+        function setActiveTab(activeTab) {
+            [studentTab, parentTab, teacherTab, hrTab].forEach(tab => tab.classList.remove("active"));
+            activeTab.classList.add("active");
+        }
 
         document.getElementById("registerForm").addEventListener("submit", function (event) {
             event.preventDefault();
@@ -457,21 +471,21 @@
             const confirmPassword = document.getElementById("confirm-password");
             const childname = document.getElementById("childname");
 
+            // HR Fields
+            const phone = document.getElementById("phone");
+            const companyDetails = document.getElementById("company_details");
+            const companyEmployeeId = document.getElementById("company_employee_id");
+
             // Reset error styles
-            name.classList.remove("error");
-            email.classList.remove("error");
-            username.classList.remove("error");
-            password.classList.remove("error");
-            confirmPassword.classList.remove("error");
-            childname.classList.remove("error");
+            document.querySelectorAll(".error").forEach(el => el.classList.remove("error"));
 
             let isValid = true;
             let errorMsg = "";
 
-            // Check if student or parent
             const isStudent = studentTab.classList.contains("active");
             const isTeacher = teacherTab.classList.contains("active");
             const isParent = parentTab.classList.contains("active");
+            const isHr = hrTab.classList.contains("active");
 
             if (!name.value.trim()) {
                 name.classList.add("error");
@@ -507,10 +521,28 @@
                 errorMsg += "Confirm Password is required. ";
             }
 
-            if (!isStudent && !isTeacher && !childname.value.trim()) {
+            if (isParent && !childname.value.trim()) {
                 childname.classList.add("error");
                 isValid = false;
                 errorMsg += "Child Name is required for parents. ";
+            }
+
+            if (isHr) {
+                if (!phone.value.trim()) {
+                    phone.classList.add("error");
+                    isValid = false;
+                    errorMsg += "Phone number is required. ";
+                }
+                if (!companyDetails.value.trim()) {
+                    companyDetails.classList.add("error");
+                    isValid = false;
+                    errorMsg += "Company details are required. ";
+                }
+                if (!companyEmployeeId.value.trim()) {
+                    companyEmployeeId.classList.add("error");
+                    isValid = false;
+                    errorMsg += "Company Employee ID is required. ";
+                }
             }
 
 
@@ -522,11 +554,6 @@
             }
 
             if (isValid) {
-                // Form is valid, allow submission
-                // Note: Since we use event.preventDefault(), we must manually submit the form after validation passes.
-                // However, the original code intended to just redirect.
-                // We should actually submit the form to the backend now.
-                // Removing preventDefault or calling submit()
                 this.submit();
             } else {
                 document.getElementById("error-message").innerHTML = "<p> " + errorMsg + "</p>";

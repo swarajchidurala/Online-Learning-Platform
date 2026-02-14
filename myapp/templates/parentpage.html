@@ -969,271 +969,439 @@
         .flash {
             animation: flash-pulse 0.3s ease-in-out;
         }
+
+        /* --- Content Sections --- */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+            margin-top: 80px;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Mobile Responsive Sidebar --- */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
+        /* .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 950;
+            opacity: 0;
+            transition: opacity 0.3s;
+        } */
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+                width: 100%;
+            }
+
+            .header {
+                width: 100%;
+                left: 0;
+                border-radius: 0;
+                padding: 15px;
+                justify-content: flex-start;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .content-split {
+                flex-direction: column;
+            }
+
+            .view-as {
+                display: none;
+                /* Hide 'view as' on mobile for space */
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
     <div class="dashboard-container">
         <!-- --- Left Sidebar --- -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <i class="fas fa-book" id="lo"></i> EduPlatform
             </div>
             <nav class="nav-links">
-                <a href="#" class="nav-item active"><i class="fas fa-home"></i> Overview</a>
-                <a href="#" class="nav-item"><i class="fas fa-book"></i> Child Profile</a>
-                <a href="#" class="nav-item"><i class="fas fa-bar-chart"></i> Performance</a>
-                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Progress</a>
-                <a href="#" class="nav-item"><i class="fas fa-comment-dots"></i> Messages</a>
-                <a href="#" class="nav-item"><i class="fas fa-signal"></i> Schedule</a>
-                <a href="#" class="nav-item"><i class="fas fa-bell"></i> Notifications</a>
-                <a href="#" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Alerts</a>
-                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+                <div class="nav-item active" onclick="showSection('overview', this); toggleSidebar()"><i
+                        class="fas fa-home"></i> Overview</div>
+                <div class="nav-item" onclick="showSection('child-profile', this); toggleSidebar()"><i
+                        class="fas fa-child"></i> Child Profile</div>
+                <div class="nav-item" onclick="showSection('performance', this); toggleSidebar()"><i
+                        class="fas fa-bar-chart"></i> Performance</div>
+                <div class="nav-item" onclick="showSection('progress', this); toggleSidebar()"><i
+                        class="fas fa-chart-line"></i> Progress</div>
+                <div class="nav-item" onclick="showSection('messages', this); toggleSidebar()"><i
+                        class="fas fa-comment-dots"></i> Messages</div>
+                <div class="nav-item" onclick="showSection('schedule', this); toggleSidebar()"><i
+                        class="fas fa-signal"></i> Schedule</div>
+                <div class="nav-item" onclick="showSection('notifications', this); toggleSidebar()"><i
+                        class="fas fa-bell"></i> Notifications</div>
+                <div class="nav-item" onclick="showSection('alerts', this); toggleSidebar()"><i
+                        class="fas fa-exclamation-triangle"></i> Alerts</div>
+                <div class="nav-item" onclick="showSection('settings', this); toggleSidebar()"><i
+                        class="fas fa-cog"></i> Settings</div>
             </nav>
-            <div class="user-info-mobile">Alex Johnson</div>
+            <a href="{% url 'mainpage' %}" class="nav-item" style="margin-top: auto; color: #dc2626; width: 100%;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
         </aside>
 
 
         <main class="main-content">
             <!-- --- Top Navigation Bar --- -->
             <header class="header">
-                <div class="header-nav">
-                    <a href="#">Features</a>
-                    <a href="#">Courses</a>
-                    <a href="#">Reviews</a>
-                    <a href="#">Pricing</a>
+                <div style="display: flex; align-items: center;">
+                    <i class="fas fa-bars mobile-menu-btn" onclick="toggleSidebar()"></i>
+                    <div class="header-nav">
+                        <h2>Parent Dashboard</h2>
+                    </div>
                 </div>
                 <div class="user-profile">
                     <span> <a href="{% url 'stdpage' %}" class="view-as"><i
                                 class="fas fa-user-graduate">&NonBreakingSpace;</i> View as Student</a></span>
                     <span>{{ parent.name }}</span>
-                    <img src="profile.jpg" alt="">
-                    <div class="logout">
-                        <a href="{% url 'mainpage' %}" title="logout"><i class="fas fa-sign-out-alt"></i></a>
-                    </div>
+                    <img src="https://ui-avatars.com/api/?name={{ parent.name }}&background=random" alt="Profile">
                 </div>
             </header>
-            <div class="dashboard-overview">
-                <div class="welcome-banner">
-                    <h1 class="progress-title"> {{ parent.childname }}'s Progress &NonBreakingSpace;<i
-                            class="fas fa-chart-line"></i>
-                    </h1>
-                    <p>Monitor your child's learning journey and achievements</p>
+
+            <!-- 1. Overview View -->
+            <div id="overview" class="content-section active">
+                <div class="dashboard-overview">
+                    <div class="welcome-banner">
+                        <h1 class="progress-title"> {{ parent.childname }}'s Progress &NonBreakingSpace;<i
+                                class="fas fa-chart-line"></i>
+                        </h1>
+                        <p>Monitor your child's learning journey and achievements</p>
+                    </div>
+
+                    <div class="stats-cards">
+                        <div class="stat-card progress-card">
+                            <span class="change-tag">+5%</span>
+                            <span class="percentage">68%</span>
+                            <p class="label">Overall Progress</p>
+                        </div>
+                        <div class="stat-card study-card">
+                            <span class="change-tag red-tag">-2.3h</span>
+                            <span class="time-value">20.3h</span>
+                            <p class="label">Weekly Study Time</p>
+                        </div>
+                        <div class="stat-card certificates-card">
+                            <div class="change-tag">
+                                <!-- <i class="fas fa-chart-line"></i> -->
+                                <span class="small-tag">+1 this month</span>
+                            </div>
+                            <span class="count-value">2</span>
+                            <p class="label">Certificates Earned</p>
+                        </div>
+                        <div class="stat-card pending-tasks-card">
+                            <span class="change-tag red-tag"> 2 due soon</span>
+                            <span class="count-value">1</span>
+                            <p class="label">Pending Tasks</p>
+                        </div>
+                    </div>
+
+                    <div class="content-split">
+                        <div class="content-left">
+                            <div class="course-list">
+                                <h2>Subject Performance</h2>
+
+                                <div class="course-card">
+                                    <img src="https://images.pexels.com/photos/220301/pexels-photo-220301.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
+                                        alt="Course Image" class="course-img">
+
+                                    <div class="course-info">
+                                        <div class="course-header">
+                                            <div>
+                                                <h3>Advanced Mathematics</h3>
+                                                <p class="instructor">Instructor: Dr. Maria Rodriguez</p>
+                                            </div>
+                                            <div class="progress-percent">
+                                                <h2>68%</h2>
+                                                <p>Complete</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress-bar">
+                                            <div class="progress-fill-68" style="--progress:68%"></div>
+                                        </div>
+
+                                        <div class="course-footer">
+                                            <p>2 of 4 lessons completed</p>
+                                            <h4 class="status-68">Good</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card 2 -->
+                                <div class="course-card">
+                                    <img src="https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
+                                        alt="Course Image" class="course-img">
+
+                                    <div class="course-info">
+                                        <div class="course-header">
+                                            <div>
+                                                <h3>English Literature</h3>
+                                                <p class="instructor">Instructor: Ms. Emily Watson</p>
+                                            </div>
+                                            <div class="progress-percent">
+                                                <h2>45%</h2>
+                                                <p>Complete</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress-bar">
+                                            <div class="progress-fill-45" style="--progress:45%"></div>
+                                        </div>
+
+                                        <div class="course-footer">
+                                            <p>3 of 7 lessons completed</p>
+                                            <h4 class="status-45">Average</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card 3 -->
+                                <div class="course-card">
+                                    <img src="https://media.istockphoto.com/id/874157664/photo/classroom-desk-and-drawn-blackboard-of-chemistry-teaching-general-view.jpg?s=612x612&w=0&k=20&c=-aGthcskbfFUxS3Ta6nIpaEFWmgLkqeRvIZntnMMcIA="
+                                        alt="Course Image" class="course-img">
+
+                                    <div class="course-info">
+                                        <div class="course-header">
+                                            <div>
+                                                <h3>Physics Fundamentals</h3>
+                                                <p class="instructor">Instructor: Prof. James Chen</p>
+                                            </div>
+                                            <div class="progress-percent">
+                                                <h2>82%</h2>
+                                                <p>Complete</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress-bar">
+                                            <div class="progress-fill-82" style="--progress:82%"></div>
+                                        </div>
+
+                                        <div class="course-footer">
+                                            <p>5 of 6 lessons completed</p>
+                                            <h4 class="status-82">Excellent</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="learning-progress">
+                                <h2>Weekly Study Pattern</h2>
+                                <p>Total Study Time <span class="weekly-time">20.31 h</span></p>
+                                <div class="chart">
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Mon</div>
+                                        <div class="bar" style="--bar-height: 60px;" data-value="2.5h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Tue</div>
+                                        <div class="bar" style="--bar-height: 90px;" data-value="3.2h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Wed</div>
+                                        <div class="bar" style="--bar-height: 50px;" data-value="1.8h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Thu</div>
+                                        <div class="bar" style="--bar-height: 115px;" data-value="4.1h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Fri</div>
+                                        <div class="bar" style="--bar-height: 80px;" data-value="2.9h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Sat</div>
+                                        <div class="bar" style="--bar-height: 105px;" data-value="3.7h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Sun</div>
+                                        <div class="bar" style="--bar-height: 65px;" data-value="2.1h"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="content-right">
+                            <div class="rightside">
+                                <div class="deadline-item">
+                                    <h2>Need Attention <i class="fas fa-exclamation-triangle" id="icon"></i></h2>
+                                    <div class="deadline-details">
+                                        <h3>Calculus Problem Set</h3>
+                                        <p>Advanced Mathematics</p>
+                                        <span class="date">22/10/2025</span>
+                                    </div>
+                                    <button class="btn send-reminder">Send Reminder</button>
+                                </div>
+                            </div>
+
+                            <div class="rightside">
+                                <div class="activity-section">
+                                    <h2>Recent Activity<i class="fas fa-bell" id="icon"></i></h2>
+                                    <ul>
+                                        <li><i class="fas fa-check-circle"></i> Completed "Derivatives and Applications"
+                                            <span>05/10/2025</span>
+                                        </li>
+                                        <li><i class="fas fa-file-alt"></i> Literature Essay graded
+                                            <span>29/09/2025</span>
+                                        </li>
+                                        <li><i class="fas fa-check-circle"></i> Submitted Physics Quiz #3
+                                            <span>28/08/2025</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="rightside">
+                                <div class="communication-section">
+                                    <h2>Communication <i class="fas fa-comments" id="icon"></i></h2>
+                                    <div class="communication-btn">
+
+                                        <div class="button">
+                                            <i class="fas fa-comment"></i>
+                                            <button class="btn full-width">Message Teacher</button>
+                                        </div>
+
+                                        <div class="button">
+                                            <i class="fas fa-user"></i>
+                                            <button class="btn full-width schedule-btn">Schedule Parent Meeting</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
                 </div>
+            </div> <!-- End Overview Section -->
 
-                <div class="stats-cards">
-                    <div class="stat-card progress-card">
-                        <span class="change-tag">+5%</span>
-                        <span class="percentage">68%</span>
-                        <p class="label">Overall Progress</p>
-                    </div>
-                    <div class="stat-card study-card">
-                        <span class="change-tag red-tag">-2.3h</span>
-                        <span class="time-value">20.3h</span>
-                        <p class="label">Weekly Study Time</p>
-                    </div>
-                    <div class="stat-card certificates-card">
-                        <div class="change-tag">
-                            <!-- <i class="fas fa-chart-line"></i> -->
-                            <span class="small-tag">+1 this month</span>
-                        </div>
-                        <span class="count-value">2</span>
-                        <p class="label">Certificates Earned</p>
-                    </div>
-                    <div class="stat-card pending-tasks-card">
-                        <span class="change-tag red-tag"> 2 due soon</span>
-                        <span class="count-value">1</span>
-                        <p class="label">Pending Tasks</p>
-                    </div>
-                </div>
-
-                <div class="content-split">
-                    <div class="content-left">
-                        <div class="course-list">
-                            <h2>Subject Performance</h2>
-
-                            <div class="course-card">
-                                <img src="https://images.pexels.com/photos/220301/pexels-photo-220301.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
-                                    alt="Course Image" class="course-img">
-
-                                <div class="course-info">
-                                    <div class="course-header">
-                                        <div>
-                                            <h3>Advanced Mathematics</h3>
-                                            <p class="instructor">Instructor: Dr. Maria Rodriguez</p>
-                                        </div>
-                                        <div class="progress-percent">
-                                            <h2>68%</h2>
-                                            <p>Complete</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="progress-bar">
-                                        <div class="progress-fill-68" style="--progress:68%"></div>
-                                    </div>
-
-                                    <div class="course-footer">
-                                        <p>2 of 4 lessons completed</p>
-                                        <h4 class="status-68">Good</h4>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 2 -->
-                            <div class="course-card">
-                                <img src="https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
-                                    alt="Course Image" class="course-img">
-
-                                <div class="course-info">
-                                    <div class="course-header">
-                                        <div>
-                                            <h3>English Literature</h3>
-                                            <p class="instructor">Instructor: Ms. Emily Watson</p>
-                                        </div>
-                                        <div class="progress-percent">
-                                            <h2>45%</h2>
-                                            <p>Complete</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="progress-bar">
-                                        <div class="progress-fill-45" style="--progress:45%"></div>
-                                    </div>
-
-                                    <div class="course-footer">
-                                        <p>3 of 7 lessons completed</p>
-                                        <h4 class="status-45">Average</h4>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 3 -->
-                            <div class="course-card">
-                                <img src="https://media.istockphoto.com/id/874157664/photo/classroom-desk-and-drawn-blackboard-of-chemistry-teaching-general-view.jpg?s=612x612&w=0&k=20&c=-aGthcskbfFUxS3Ta6nIpaEFWmgLkqeRvIZntnMMcIA="
-                                    alt="Course Image" class="course-img">
-
-                                <div class="course-info">
-                                    <div class="course-header">
-                                        <div>
-                                            <h3>Physics Fundamentals</h3>
-                                            <p class="instructor">Instructor: Prof. James Chen</p>
-                                        </div>
-                                        <div class="progress-percent">
-                                            <h2>82%</h2>
-                                            <p>Complete</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="progress-bar">
-                                        <div class="progress-fill-82" style="--progress:82%"></div>
-                                    </div>
-
-                                    <div class="course-footer">
-                                        <p>5 of 6 lessons completed</p>
-                                        <h4 class="status-82">Excellent</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="learning-progress">
-                            <h2>Weekly Study Pattern</h2>
-                            <p>Total Study Time <span class="weekly-time">20.31 h</span></p>
-                            <div class="chart">
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Mon</div>
-                                    <div class="bar" style="--bar-height: 60px;" data-value="2.5h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Tue</div>
-                                    <div class="bar" style="--bar-height: 90px;" data-value="3.2h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Wed</div>
-                                    <div class="bar" style="--bar-height: 50px;" data-value="1.8h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Thu</div>
-                                    <div class="bar" style="--bar-height: 115px;" data-value="4.1h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Fri</div>
-                                    <div class="bar" style="--bar-height: 80px;" data-value="2.9h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Sat</div>
-                                    <div class="bar" style="--bar-height: 105px;" data-value="3.7h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Sun</div>
-                                    <div class="bar" style="--bar-height: 65px;" data-value="2.1h"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="content-right">
-                        <div class="rightside">
-                            <div class="deadline-item">
-                                <h2>Need Attention <i class="fas fa-exclamation-triangle" id="icon"></i></h2>
-                                <div class="deadline-details">
-                                    <h3>Calculus Problem Set</h3>
-                                    <p>Advanced Mathematics</p>
-                                    <span class="date">22/10/2025</span>
-                                </div>
-                                <button class="btn send-reminder">Send Reminder</button>
-                            </div>
-                        </div>
-
-                        <div class="rightside">
-                            <div class="activity-section">
-                                <h2>Recent Activity<i class="fas fa-bell" id="icon"></i></h2>
-                                <ul>
-                                    <li><i class="fas fa-check-circle"></i> Completed "Derivatives and Applications"
-                                        <span>05/10/2025</span>
-                                    </li>
-                                    <li><i class="fas fa-file-alt"></i> Literature Essay graded <span>29/09/2025</span>
-                                    </li>
-                                    <li><i class="fas fa-check-circle"></i> Submitted Physics Quiz #3
-                                        <span>28/08/2025</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="rightside">
-                            <div class="communication-section">
-                                <h2>Communication <i class="fas fa-comments" id="icon"></i></h2>
-                                <div class="communication-btn">
-
-                                    <div class="button">
-                                        <i class="fas fa-comment"></i>
-                                        <button class="btn full-width">Message Teacher</button>
-                                    </div>
-
-                                    <div class="button">
-                                        <i class="fas fa-user"></i>
-                                        <button class="btn full-width schedule-btn">Schedule Parent Meeting</button>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                    </div>
-                </div>
+            <!-- Placeholder Sections -->
+            <div id="child-profile" class="content-section">
+                <h2>Child Profile</h2>
+                <p>Child profile details will appear here.</p>
+            </div>
+            <div id="performance" class="content-section">
+                <h2>Performance Analytics</h2>
+                <p>Detailed performance metrics will appear here.</p>
+            </div>
+            <div id="progress" class="content-section">
+                <h2>Progress Tracker</h2>
+                <p>Tracking progress across courses will appear here.</p>
+            </div>
+            <div id="messages" class="content-section">
+                <h2>Messages</h2>
+                <p>Parent-Teacher communication will appear here.</p>
+            </div>
+            <div id="schedule" class="content-section">
+                <h2>Schedule</h2>
+                <p>Student's schedule will appear here.</p>
+            </div>
+            <div id="notifications" class="content-section">
+                <h2>Notifications</h2>
+                <p>Notifications will appear here.</p>
+            </div>
+            <div id="alerts" class="content-section">
+                <h2>Alerts</h2>
+                <p>Important alerts will appear here.</p>
+            </div>
+            <div id="settings" class="content-section">
+                <h2>Settings</h2>
+                <p>Account settings will appear here.</p>
             </div>
         </main>
     </div>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+
+            // Show target section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Highlight sidebar item
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+            }
+        }
+    </script>
 </body>
 
 </html>

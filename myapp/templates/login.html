@@ -311,6 +311,7 @@
                 <button type="button" id="studentTab" class="tab active">Student</button>
                 <button type="button" id="parentTab" class="tab">Parent</button>
                 <button type="button" id="teacherTab" class="tab">Teacher</button>
+                <button type="button" id="hrTab" class="tab">HR</button>
             </div>
             <div id="error-message" class="error-message">
                 {% if error %}
@@ -334,6 +335,12 @@
                     <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                 </div>
             </div>
+            <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                <label for="rememberMe" style="display: flex; align-items: center; cursor: pointer; margin-bottom: 0;">
+                    <input type="checkbox" id="rememberMe" style="width: auto; margin-right: 8px;">
+                    Remember Me
+                </label>
+            </div>
             <div class="forgot-password">
                 <a href="#">Forgot Password?</a>
             </div>
@@ -348,121 +355,143 @@
         document.addEventListener('DOMContentLoaded', function () {
             const togglePassword = document.querySelector('#togglePassword');
             const password = document.querySelector('#password');
+            const usernameInput = document.getElementById("username");
+            const rememberMeCheckbox = document.getElementById("rememberMe");
+            const tabs = document.querySelectorAll(".tab");
+            const studentTab = document.getElementById("studentTab");
+            const parentTab = document.getElementById("parentTab");
+            const teacherTab = document.getElementById("teacherTab");
+            const hrTab = document.getElementById("hrTab");
+            const childNameField = document.getElementById("childNameField");
+            const userTypeInput = document.getElementById("user_type");
 
+            // --- 1. Determine Active Tab ---
+            // Priority: Server Context (on error) > LocalStorage (on refresh) > Default (Student)
+            let activeUserType = "{{ user_type|default:'' }}";
+
+            if (!activeUserType) {
+                activeUserType = localStorage.getItem("activeUserType") || "student";
+            }
+
+            function setActiveTab(type) {
+                // Reset all tabs
+                tabs.forEach(t => t.classList.remove("active"));
+
+                // Set active tab based on type
+                if (type === 'student') studentTab.classList.add("active");
+                else if (type === 'parent') parentTab.classList.add("active");
+                else if (type === 'teacher') teacherTab.classList.add("active");
+                else if (type === 'hr') hrTab.classList.add("active");
+
+                // Update hidden input
+                userTypeInput.value = type;
+
+                // Update UI based on type
+                if (type === 'parent') {
+                    childNameField.style.display = "block";
+                } else {
+                    childNameField.style.display = "none";
+                }
+
+                // Clear form and messages on tab switch
+                document.getElementById("loginForm").reset();
+                document.getElementById("error-message").style.display = 'none';
+                document.getElementById("confirm-message").style.display = 'none';
+                document.getElementById("name").classList.remove("error");
+                document.getElementById("username").classList.remove("error");
+                document.getElementById("password").classList.remove("error");
+
+                // Save to localStorage
+                localStorage.setItem("activeUserType", type);
+            }
+
+            // Initialize on load
+            setActiveTab(activeUserType);
+
+            // --- 2. Tab Click Listeners ---
+            studentTab.addEventListener("click", () => setActiveTab("student"));
+            parentTab.addEventListener("click", () => setActiveTab("parent"));
+            teacherTab.addEventListener("click", () => setActiveTab("teacher"));
+            hrTab.addEventListener("click", () => setActiveTab("hr"));
+
+            // --- 3. Toggle Password Visibility ---
             togglePassword.addEventListener('click', function (e) {
-                // Toggle the type attribute
+                // toggle the type attribute
                 const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                 password.setAttribute('type', type);
 
-                // Toggle the eye icon
-                this.classList.toggle('fa-eye');
-                this.classList.toggle('fa-eye-slash');
+                // toggle the eye slash icon
+                this.classList.toggle('fa-eye-outline');
+                this.classList.toggle('fa-eye-slash-outline');
+            });
+
+            // --- 4. Remember Me Logic ---
+            // Load saved credentials if 'Remember Me' was checked
+            if (localStorage.getItem("rememberMe") === "true") {
+                usernameInput.value = localStorage.getItem("username") || "";
+                password.value = localStorage.getItem("password") || "";
+                rememberMeCheckbox.checked = true;
+            }
+
+            // --- 5. Form Submit Handler ---
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function (e) {
+                // Clear previous messages
+                const errorMessageDiv = document.getElementById("error-message");
+                const confirmMessageDiv = document.getElementById("confirm-message");
+                if (errorMessageDiv) errorMessageDiv.style.display = 'none';
+                if (confirmMessageDiv) confirmMessageDiv.style.display = 'none';
+
+                // Reset error styles
+                document.getElementById("name").classList.remove("error");
+                document.getElementById("username").classList.remove("error");
+                document.getElementById("password").classList.remove("error");
+
+                let isValid = true;
+                let errorMsg = "";
+
+                // Check if parent tab is active and child name is required
+                const isParent = parentTab.classList.contains("active");
+                const nameInput = document.getElementById("name");
+
+                if (isParent && !nameInput.value.trim()) {
+                    nameInput.classList.add("error");
+                    isValid = false;
+                    errorMsg += "Child Name is required for parents. ";
+                }
+
+                if (!usernameInput.value.trim()) {
+                    usernameInput.classList.add("error");
+                    isValid = false;
+                    errorMsg += "Username is required. ";
+                }
+
+                if (!password.value) {
+                    password.classList.add("error");
+                    isValid = false;
+                    errorMsg += "Password is required. ";
+                }
+
+                if (!isValid) {
+                    e.preventDefault(); // Stop if invalid client side
+                    errorMessageDiv.innerHTML = "<p> " + errorMsg + "</p>";
+                    errorMessageDiv.style.display = 'block';
+                }
+
+                // Save or Clear Credentials based on Checkbox
+                if (rememberMeCheckbox.checked) {
+                    localStorage.setItem("username", usernameInput.value);
+                    localStorage.setItem("password", password.value);
+                    localStorage.setItem("rememberMe", "true");
+                } else {
+                    localStorage.removeItem("username");
+                    localStorage.removeItem("password");
+                    localStorage.removeItem("rememberMe");
+                }
             });
         });
 
-        const tabs = document.querySelectorAll(".tab");
-        tabs.forEach(tab => {
-            tab.addEventListener("click", () => {
-                tabs.forEach(t => t.classList.remove("active"));
-                tab.classList.add("active");
-            });
-        });
 
-        const studentTab = document.getElementById("studentTab");
-        const parentTab = document.getElementById("parentTab");
-        const teacherTab = document.getElementById("teacherTab");
-        const childNameField = document.getElementById("childNameField");
-
-        studentTab.addEventListener("click", () => {
-            studentTab.classList.add("active");
-            parentTab.classList.remove("active");
-            teacherTab.classList.remove("active");
-            childNameField.style.display = "none"; // Hide child name
-            document.getElementById("user_type").value = "student";
-            document.getElementById("loginForm").reset();
-            document.getElementById("user_type").value = "student";
-            document.getElementById("error-message").style.display = 'none';
-            document.getElementById("confirm-message").style.display = 'none';
-            document.getElementById("name").classList.remove("error");
-            document.getElementById("username").classList.remove("error");
-            document.getElementById("password").classList.remove("error");
-        });
-
-        parentTab.addEventListener("click", () => {
-            parentTab.classList.add("active");
-            studentTab.classList.remove("active");
-            teacherTab.classList.remove("active");
-            childNameField.style.display = "block"; // Show child name
-            document.getElementById("user_type").value = "parent";
-            document.getElementById("loginForm").reset();
-            document.getElementById("user_type").value = "parent";
-            document.getElementById("error-message").style.display = 'none';
-            document.getElementById("confirm-message").style.display = 'none';
-            document.getElementById("name").classList.remove("error");
-            document.getElementById("username").classList.remove("error");
-            document.getElementById("password").classList.remove("error");
-        });
-
-        teacherTab.addEventListener("click", () => {
-            teacherTab.classList.add("active");
-            studentTab.classList.remove("active");
-            parentTab.classList.remove("active");
-            childNameField.style.display = "none"; // Hide child name
-            document.getElementById("user_type").value = "teacher";
-            document.getElementById("loginForm").reset();
-            document.getElementById("user_type").value = "teacher";
-            document.getElementById("error-message").style.display = 'none';
-            document.getElementById("confirm-message").style.display = 'none';
-            document.getElementById("name").classList.remove("error");
-            document.getElementById("username").classList.remove("error");
-            document.getElementById("password").classList.remove("error");
-        });
-
-        // We are removing the submit interceptor or updating it to just validate and then let it submit
-        document.getElementById("loginForm").addEventListener("submit", function (event) {
-            // event.preventDefault(); // Remove this to allow actual submission
-
-            // Hide previous messages
-            // document.getElementById("error-message").style.display = 'none';
-            document.getElementById("confirm-message").style.display = 'none';
-
-            const name = document.getElementById("name");
-            const username = document.getElementById("username");
-            const password = document.getElementById("password");
-
-            // Reset error styles
-            name.classList.remove("error");
-            username.classList.remove("error");
-            password.classList.remove("error");
-
-            let isValid = true;
-            let errorMsg = "";
-
-            // Check if student or parent
-            const isStudent = studentTab.classList.contains("active");
-            const isTeacher = teacherTab.classList.contains("active");
-
-            // Ignore child name validation for login as we only use username/password in backend
-            /*
-            if (!isStudent && !isTeacher && !name.value.trim()) {
-                name.classList.add("error");
-                isValid = false;
-                errorMsg += "Child Name is required for parents. ";
-            }
-            */
-
-            if (!password.value) {
-                password.classList.add("error");
-                isValid = false;
-                errorMsg += "Password is required. ";
-            }
-
-            if (!isValid) {
-                event.preventDefault(); // Stop if invalid client side
-                document.getElementById("error-message").innerHTML = "<p> " + errorMsg + "</p>";
-                document.getElementById("error-message").style.display = 'block';
-            }
-        });
 
     </script>
 </body>

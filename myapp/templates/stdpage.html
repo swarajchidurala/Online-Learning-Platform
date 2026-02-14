@@ -817,206 +817,372 @@
                 background-color: var(--card-bg);
             }
         }
+
+        /* --- Content Sections --- */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+            margin-top: 80px;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Mobile Responsive Sidebar --- */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
+        /* .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 950;
+            opacity: 0;
+            transition: opacity 0.3s;
+        } */
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+                width: 100%;
+            }
+
+            .header {
+                width: 100%;
+                left: 0;
+                border-radius: 0;
+                padding: 15px;
+                justify-content: flex-start;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-nav {
+                /* Hide standard nav links on mobile for cleaner look or adjust if needed */
+                display: none;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .content-split {
+                flex-direction: column;
+            }
+        }
     </style>
 
 </head>
 
 <body>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
     <div class="dashboard-container">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <i class="fas fa-book" id="lo"></i> EduPlatform
             </div>
             <nav class="nav-links">
-                <a href="#" class="nav-item active"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="#" class="nav-item"><i class="fas fa-book"></i> Courses</a>
-                <a href="#" class="nav-item"><i class="fas fa-bar-chart"></i> Schedule</a>
-                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Progress</a>
-                <a href="#" class="nav-item"><i class="fas fa-comment-dots"></i> Messages</a>
-                <a href="#" class="nav-item"><i class="fas fa-certificate"></i> Certificates</a>
-                <a href="#" class="nav-item"><i class="fas fa-bell"></i> Notifications</a>
-                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Achievements</a>
-                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+                <div class="nav-item active" onclick="showSection('dashboard', this); toggleSidebar()"><i
+                        class="fas fa-home"></i> Dashboard</div>
+                <div class="nav-item" onclick="showSection('courses', this); toggleSidebar()"><i
+                        class="fas fa-book"></i> Courses</div>
+                <div class="nav-item" onclick="showSection('schedule', this); toggleSidebar()"><i
+                        class="fas fa-calendar-alt"></i> Schedule</div>
+                <div class="nav-item" onclick="showSection('progress', this); toggleSidebar()"><i
+                        class="fas fa-chart-line"></i> Progress</div>
+                <div class="nav-item" onclick="showSection('messages', this); toggleSidebar()"><i
+                        class="fas fa-comment-dots"></i> Messages</div>
+                <div class="nav-item" onclick="showSection('certificates', this); toggleSidebar()"><i
+                        class="fas fa-certificate"></i> Certificates</div>
+                <div class="nav-item" onclick="showSection('notifications', this); toggleSidebar()"><i
+                        class="fas fa-bell"></i> Notifications</div>
+                <div class="nav-item" onclick="showSection('achievements', this); toggleSidebar()"><i
+                        class="fas fa-trophy"></i> Achievements</div>
+                <div class="nav-item" onclick="showSection('settings', this); toggleSidebar()"><i
+                        class="fas fa-cog"></i> Settings</div>
             </nav>
+            <a href="{% url 'mainpage' %}" class="nav-item" style="margin-top: auto; color: #dc2626; width: 100%;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+
             <div class="user-info-mobile">{{ student.name }}</div>
         </aside>
 
         <main class="main-content">
             <header class="header">
-                <div class="header-nav">
-                    <a href="#">Features</a>
-                    <a href="#">Courses</a>
-                    <a href="#">Reviews</a>
-                    <a href="#">Pricing</a>
+                <div style="display: flex; align-items: center;">
+                    <i class="fas fa-bars mobile-menu-btn" onclick="toggleSidebar()"></i>
+                    <div class="header-nav">
+                        <h2>Student Dashboard</h2>
+                    </div>
                 </div>
                 <div class="user-profile">
                     <span>{{ student.name }}</span>
                     <img src="https://ui-avatars.com/api/?name={{ student.name }}" alt="">
-                    <div class="logout">
-                        <a href="{% url 'mainpage' %}" title="logout"><i class="fas fa-sign-out-alt"></i></a>
-                    </div>
+
                 </div>
             </header>
 
-            <div class="dashboard-overview">
-                <div class="welcome-banner">
-                    <h1>Welcome back, {{ student.name }}! 👋</h1>
-                    <p>Ready to continue your learning journey?</p>
+            <!-- 1. Dashboard View -->
+            <div id="dashboard" class="content-section active">
+
+                <div class="dashboard-overview">
+                    <div class="welcome-banner">
+                        <h1>Welcome back, {{ student.name }}! 👋</h1>
+                        <p>Ready to continue your learning journey?</p>
+                    </div>
+
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <i class="fas fa-layer-group"></i>
+                            <p>3</p>
+                            <span>Courses</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-signal"></i>
+                            <p>68%</p>
+                            <span>Progress</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <p>12h</p>
+                            <span>Study Time</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-trophy"></i>
+                            <p>2</p>
+                            <span>Certificates</span>
+                        </div>
+                    </div>
+
+                    <div class="content-split">
+                        <div class="content-left">
+                            <div class="course-list">
+                                <h2>Continue Learning</h2>
+                                <div class="course-item">
+                                    <img src="https://images.pexels.com/photos/220301/pexels-photo-220301.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
+                                        alt="Advanced Mathematics">
+                                    <div class="course-details">
+                                        <h3>Advanced Mathematics</h3>
+                                        <p><i class="fas fa-clock"></i> 12 weeks | <i class="fas fa-bar-chart"></i> 68%
+                                            complete</p>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-fill" style="--progress:68%"></div>
+                                        </div>
+                                    </div>
+                                    <button class="continue-btn">Continue ❯</button>
+                                </div>
+
+                                <div class="course-item">
+                                    <img src="https://media.istockphoto.com/id/874157664/photo/classroom-desk-and-drawn-blackboard-of-chemistry-teaching-general-view.jpg?s=612x612&w=0&k=20&c=-aGthcskbfFUxS3Ta6nIpaEFWmgLkqeRvIZntnMMcIA="
+                                        alt="Physics Fundamentals">
+                                    <div class="course-details">
+                                        <h3>Physics Fundamentals</h3>
+                                        <p><i class="fas fa-clock"></i> 10 weeks | <i class="fas fa-bar-chart"></i> 42%
+                                            complete</p>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-fill" style="--progress:42%"></div>
+                                        </div>
+                                    </div>
+                                    <button class="continue-btn">Continue ❯</button>
+                                </div>
+                            </div>
+
+                            <div class="learning-progress">
+                                <h2>Learning Progress</h2>
+                                <p>Weekly Study Pattern <span class="weekly-time">20.31 h</span></p>
+                                <div class="chart">
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Mon</div>
+                                        <div class="bar" style="--bar-height: 60px;" data-value="2.5h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Tue</div>
+                                        <div class="bar" style="--bar-height: 90px;" data-value="3.2h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Wed</div>
+                                        <div class="bar" style="--bar-height: 50px;" data-value="1.8h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Thu</div>
+                                        <div class="bar" style="--bar-height: 115px;" data-value="4.1h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Fri</div>
+                                        <div class="bar" style="--bar-height: 80px;" data-value="2.9h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Sat</div>
+                                        <div class="bar" style="--bar-height: 105px;" data-value="3.7h"></div>
+                                    </div>
+
+                                    <div class="bar-wrapper">
+                                        <div class="day">Sun</div>
+                                        <div class="bar" style="--bar-height: 65px;" data-value="2.1h"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-right">
+                            <div class="rightside">
+                                <div class="deadline-item">
+                                    <h2>Upcoming Deadlines <i class="fas fa-calendar-alt" id="icon"></i></h2>
+                                    <div class="deadline-details">
+                                        <h3>Calculus Problem Set</h3>
+                                        <p>Advanced Mathematics</p>
+                                        <span class="date">22/10/2025</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rightside">
+                                <div class="activity-section">
+                                    <h2>Recent Activity<i class="fas fa-bell" id="icon"></i></h2>
+                                    <ul>
+                                        <li><i class="fas fa-check-circle"></i> Completed "Derivatives and Applications"
+                                            <span>05/10/2025</span>
+                                        </li>
+                                        <li><i class="fas fa-file-alt"></i> Literature Essay graded
+                                            <span>29/09/2025</span>
+                                        </li>
+                                        <li><i class="fas fa-check-circle"></i> Submitted Physics Quiz #3
+                                            <span>28/08/2025</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="rightside">
+                                <div class="achievements-section">
+                                    <h2>Recent Achievements<i class="fas fa-trophy" id="icon"></i></h2>
+                                    <div class="achievement-item">
+                                        <span class="badge"><i class="fas fa-trophy"></i></span>
+                                        <div class="achievement-text">
+                                            <h3>Math Master</h3>
+                                            <p>Completed calculus module</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="achievement-item">
+                                        <span class="badge"><i class="fas fa-trophy"></i></span>
+                                        <div class="achievement-text">
+                                            <h3>Perfect Score</h3>
+                                            <p>Aced the physics quiz</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- End Dashboard Section -->
+
+                <!-- Placeholder Sections -->
+                <div id="courses" class="content-section">
+                    <h2>My Courses</h2>
+                    <p>Course content will appear here.</p>
+                </div>
+                <div id="schedule" class="content-section">
+                    <h2>Schedule</h2>
+                    <p>Class schedule will appear here.</p>
+                </div>
+                <div id="progress" class="content-section">
+                    <h2>Progress Tracker</h2>
+                    <p>Progress analytics will appear here.</p>
+                </div>
+                <div id="messages" class="content-section">
+                    <h2>Messages</h2>
+                    <p>Messages will appear here.</p>
+                </div>
+                <div id="certificates" class="content-section">
+                    <h2>My Certificates</h2>
+                    <p>Certificates will appear here.</p>
+                </div>
+                <div id="notifications" class="content-section">
+                    <h2>Notifications</h2>
+                    <p>Notifications will appear here.</p>
+                </div>
+                <div id="achievements" class="content-section">
+                    <h2>Achievements</h2>
+                    <p>Achievements will appear here.</p>
+                </div>
+                <div id="settings" class="content-section">
+                    <h2>Settings</h2>
+                    <p>Settings configuration will appear here.</p>
                 </div>
 
-                <div class="stats-cards">
-                    <div class="stat-card">
-                        <i class="fas fa-layer-group"></i>
-                        <p>3</p>
-                        <span>Courses</span>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-signal"></i>
-                        <p>68%</p>
-                        <span>Progress</span>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-clock"></i>
-                        <p>12h</p>
-                        <span>Study Time</span>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-trophy"></i>
-                        <p>2</p>
-                        <span>Certificates</span>
-                    </div>
-                </div>
-
-                <div class="content-split">
-                    <div class="content-left">
-                        <div class="course-list">
-                            <h2>Continue Learning</h2>
-                            <div class="course-item">
-                                <img src="https://images.pexels.com/photos/220301/pexels-photo-220301.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop"
-                                    alt="Advanced Mathematics">
-                                <div class="course-details">
-                                    <h3>Advanced Mathematics</h3>
-                                    <p><i class="fas fa-clock"></i> 12 weeks | <i class="fas fa-bar-chart"></i> 68%
-                                        complete</p>
-                                    <div class="progress-bar-container">
-                                        <div class="progress-fill" style="--progress:68%"></div>
-                                    </div>
-                                </div>
-                                <button class="continue-btn">Continue ❯</button>
-                            </div>
-
-                            <div class="course-item">
-                                <img src="https://media.istockphoto.com/id/874157664/photo/classroom-desk-and-drawn-blackboard-of-chemistry-teaching-general-view.jpg?s=612x612&w=0&k=20&c=-aGthcskbfFUxS3Ta6nIpaEFWmgLkqeRvIZntnMMcIA="
-                                    alt="Physics Fundamentals">
-                                <div class="course-details">
-                                    <h3>Physics Fundamentals</h3>
-                                    <p><i class="fas fa-clock"></i> 10 weeks | <i class="fas fa-bar-chart"></i> 42%
-                                        complete</p>
-                                    <div class="progress-bar-container">
-                                        <div class="progress-fill" style="--progress:42%"></div>
-                                    </div>
-                                </div>
-                                <button class="continue-btn">Continue ❯</button>
-                            </div>
-                        </div>
-
-                        <div class="learning-progress">
-                            <h2>Learning Progress</h2>
-                            <p>Weekly Study Pattern <span class="weekly-time">20.31 h</span></p>
-                            <div class="chart">
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Mon</div>
-                                    <div class="bar" style="--bar-height: 60px;" data-value="2.5h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Tue</div>
-                                    <div class="bar" style="--bar-height: 90px;" data-value="3.2h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Wed</div>
-                                    <div class="bar" style="--bar-height: 50px;" data-value="1.8h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Thu</div>
-                                    <div class="bar" style="--bar-height: 115px;" data-value="4.1h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Fri</div>
-                                    <div class="bar" style="--bar-height: 80px;" data-value="2.9h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Sat</div>
-                                    <div class="bar" style="--bar-height: 105px;" data-value="3.7h"></div>
-                                </div>
-
-                                <div class="bar-wrapper">
-                                    <div class="day">Sun</div>
-                                    <div class="bar" style="--bar-height: 65px;" data-value="2.1h"></div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="content-right">
-                        <div class="rightside">
-                            <div class="deadline-item">
-                                <h2>Upcoming Deadlines <i class="fas fa-calendar-alt" id="icon"></i></h2>
-                                <div class="deadline-details">
-                                    <h3>Calculus Problem Set</h3>
-                                    <p>Advanced Mathematics</p>
-                                    <span class="date">22/10/2025</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="rightside">
-                            <div class="activity-section">
-                                <h2>Recent Activity<i class="fas fa-bell" id="icon"></i></h2>
-                                <ul>
-                                    <li><i class="fas fa-check-circle"></i> Completed "Derivatives and Applications"
-                                        <span>05/10/2025</span>
-                                    </li>
-                                    <li><i class="fas fa-file-alt"></i> Literature Essay graded <span>29/09/2025</span>
-                                    </li>
-                                    <li><i class="fas fa-check-circle"></i> Submitted Physics Quiz #3
-                                        <span>28/08/2025</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="rightside">
-                            <div class="achievements-section">
-                                <h2>Recent Achievements<i class="fas fa-trophy" id="icon"></i></h2>
-                                <div class="achievement-item">
-                                    <span class="badge"><i class="fas fa-trophy"></i></span>
-                                    <div class="achievement-text">
-                                        <h3>Math Master</h3>
-                                        <p>Completed calculus module</p>
-                                    </div>
-                                </div>
-
-                                <div class="achievement-item">
-                                    <span class="badge"><i class="fas fa-trophy"></i></span>
-                                    <div class="achievement-text">
-                                        <h3>Perfect Score</h3>
-                                        <p>Aced the physics quiz</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
     <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+
+            // Show target section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Highlight sidebar item
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Select all clickable elements that need the "pop" animation
             const clickableElements = document.querySelectorAll('.continue-btn, .nav-item, .stat-card');
@@ -1048,6 +1214,7 @@
         });
 
     </script>
+    {% include 'chatbot.html' %}
 </body>
 
 </html>

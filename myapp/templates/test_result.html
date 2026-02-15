@@ -1,0 +1,261 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Result: {{ course.title }}</title>
+    <!-- Fonts and Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- Styles inherited from stdpage.html --- */
+        :root {
+            --primary-color: #2961eb;
+            --secondary-color: #6a63d7;
+            --bg-light: #f4f7f9;
+            --text-dark: #333;
+            --text-light: #666;
+            --card-bg: #fff;
+            --border-radius: 12px;
+            --border: 1px solid #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 50px;
+            margin-bottom: 30px;
+            border: var(--border);
+            animation: bounceIn 0.8s ease;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: conic-gradient(var(--primary-color) var(--score-pct, 0%), #e0e0e0 0);
+        }
+
+        .score-inner {
+            width: 130px;
+            height: 130px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Review Section */
+        #review-section {
+            display: none;
+            text-align: left;
+            margin-top: 40px;
+        }
+
+        .review-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+
+        .review-card.correct {
+            border-left: 5px solid #22c55e;
+        }
+
+        .review-card.incorrect {
+            border-left: 5px solid #ef4444;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .answer-row {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+
+        .your-answer {
+            background: #f3f4f6;
+        }
+
+        .correct-answer {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .badge-correct {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge-wrong {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="result-card">
+            <h1>Test Completed!</h1>
+            <p style="color: var(--text-light); margin-bottom: 30px;">You have successfully completed the assessment.
+            </p>
+
+            <div class="score-circle" style="--score-pct: {{ percentage }}%;">
+                <div class="score-inner">
+                    <div class="score-text">{{ score }}</div>
+                    <div class="score-label">out of {{ total }}</div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom: 20px;">Percentage: {{ percentage|floatformat:1 }}%</h2>
+
+            <div>
+                <button onclick="toggleReview()" class="btn btn-outline">Check Answers</button>
+                <a href="{% url 'stdpage' %}" class="btn btn-primary">Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div id="review-section">
+            <h2 style="text-align: center; margin-bottom: 30px;">Review Answers</h2>
+
+            {% for q in questions %}
+            <div class="review-card {% if q.is_correct %}correct{% else %}incorrect{% endif %}">
+                <div class="question-text">Q{{ forloop.counter }}. {{ q.question }}</div>
+
+                <div class="answer-row your-answer">
+                    <span class="badge {% if q.is_correct %}badge-correct{% else %}badge-wrong{% endif %}">You</span>
+                    {{ q.user_selected|default:"No Answer" }}
+                </div>
+
+                {% if not q.is_correct %}
+                <div class="answer-row correct-answer">
+                    <span class="badge badge-correct">Correct</span>
+                    {{ q.correct_answer }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{% url 'stdpage' %}" class="btn btn-primary">Finish Review</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleReview() {
+            const reviewSection = document.getElementById('review-section');
+            if (reviewSection.style.display === 'block') {
+                reviewSection.style.display = 'none';
+                window.scrollTo(0, 0);
+            } else {
+                reviewSection.style.display = 'block';
+                reviewSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+
+</body>
+
+</html>

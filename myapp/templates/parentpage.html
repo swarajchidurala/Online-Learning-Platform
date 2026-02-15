@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{% static 'myapp/image/icon.png' %}" type="image/x-icon">
+    <script src="{% static 'myapp/js/messaging.js' %}"></script>
     <title>Parent Dashboard⭐💫✨</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -1002,7 +1003,7 @@
             color: var(--primary-color);
         }
 
-        /* .overlay {
+        .overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -1013,7 +1014,7 @@
             z-index: 950;
             opacity: 0;
             transition: opacity 0.3s;
-        } */
+        }
 
         .overlay.active {
             display: block;
@@ -1066,7 +1067,18 @@
                 /* Hide 'view as' on mobile for space */
             }
         }
+
+        /* card */
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: var(--border);
+            transition: transform 0.2s;
+        }
     </style>
+
 </head>
 
 <body>
@@ -1078,25 +1090,18 @@
             <div class="logo">
                 <i class="fas fa-book" id="lo"></i> EduPlatform
             </div>
-            <nav class="nav-links">
-                <div class="nav-item active" onclick="showSection('overview', this); toggleSidebar()"><i
-                        class="fas fa-home"></i> Overview</div>
-                <div class="nav-item" onclick="showSection('child-profile', this); toggleSidebar()"><i
-                        class="fas fa-child"></i> Child Profile</div>
-                <div class="nav-item" onclick="showSection('performance', this); toggleSidebar()"><i
-                        class="fas fa-bar-chart"></i> Performance</div>
-                <div class="nav-item" onclick="showSection('progress', this); toggleSidebar()"><i
-                        class="fas fa-chart-line"></i> Progress</div>
-                <div class="nav-item" onclick="showSection('messages', this); toggleSidebar()"><i
-                        class="fas fa-comment-dots"></i> Messages</div>
-                <div class="nav-item" onclick="showSection('schedule', this); toggleSidebar()"><i
-                        class="fas fa-signal"></i> Schedule</div>
-                <div class="nav-item" onclick="showSection('notifications', this); toggleSidebar()"><i
-                        class="fas fa-bell"></i> Notifications</div>
-                <div class="nav-item" onclick="showSection('alerts', this); toggleSidebar()"><i
-                        class="fas fa-exclamation-triangle"></i> Alerts</div>
-                <div class="nav-item" onclick="showSection('settings', this); toggleSidebar()"><i
-                        class="fas fa-cog"></i> Settings</div>
+            <nav class="nav-links" style="cursor: pointer;">
+                <div class="nav-item active" onclick="showSection('overview', this)"><i class="fas fa-home"></i>
+                    Overview</div>
+                <div class="nav-item" onclick="showSection('child-profile', this)"><i class="fas fa-child"></i>
+                    Child Profile</div>
+                <div class="nav-item" onclick="showSection('performance', this)"><i class="fas fa-bar-chart"></i>
+                    Performance</div>
+                <div class="nav-item" onclick="showSection('progress', this)"><i class="fas fa-chart-line"></i>
+                    Progress</div>
+                <div class="nav-item" onclick="showSection('message',this)"><i class="fas fa-message"></i>
+                    Messages</div>
+
             </nav>
             <a href="{% url 'mainpage' %}" class="nav-item" style="margin-top: auto; color: #dc2626; width: 100%;">
                 <i class="fas fa-sign-out-alt"></i> Logout
@@ -1291,44 +1296,14 @@
                         </div>
                         <div class="content-right">
                             <div class="rightside">
-                                <div class="deadline-item">
-                                    <h2>Need Attention <i class="fas fa-exclamation-triangle" id="icon"></i></h2>
-                                    <div class="deadline-details">
-                                        <h3>Calculus Problem Set</h3>
-                                        <p>Advanced Mathematics</p>
-                                        <span class="date">22/10/2025</span>
-                                    </div>
-                                    <button class="btn send-reminder">Send Reminder</button>
-                                </div>
-                            </div>
-
-                            <div class="rightside">
-                                <div class="activity-section">
-                                    <h2>Recent Activity<i class="fas fa-bell" id="icon"></i></h2>
-                                    <ul>
-                                        <li><i class="fas fa-check-circle"></i> Completed "Derivatives and Applications"
-                                            <span>05/10/2025</span>
-                                        </li>
-                                        <li><i class="fas fa-file-alt"></i> Literature Essay graded
-                                            <span>29/09/2025</span>
-                                        </li>
-                                        <li><i class="fas fa-check-circle"></i> Submitted Physics Quiz #3
-                                            <span>28/08/2025</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="rightside">
                                 <div class="communication-section">
                                     <h2>Communication <i class="fas fa-comments" id="icon"></i></h2>
                                     <div class="communication-btn">
-
                                         <div class="button">
-                                            <i class="fas fa-comment"></i>
-                                            <button class="btn full-width">Message Teacher</button>
+                                            <i class="fas fa-message"></i>
+                                            <button class="btn full-width message-btn"
+                                                onclick="showSection('message',this)">Messages</button>
                                         </div>
-
                                         <div class="button">
                                             <i class="fas fa-user"></i>
                                             <button class="btn full-width schedule-btn">Schedule Parent Meeting</button>
@@ -1337,9 +1312,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
                         </div>
                     </div>
                 </div>
@@ -1352,32 +1324,155 @@
             </div>
             <div id="performance" class="content-section">
                 <h2>Performance Analytics</h2>
-                <p>Detailed performance metrics will appear here.</p>
+                {% if test_results %}
+                <div class="card">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa; text-align: left;">
+                                <th style="padding: 12px; border-bottom: 2px solid #eee;">Course</th>
+                                <th style="padding: 12px; border-bottom: 2px solid #eee;">Date</th>
+                                <th style="padding: 12px; border-bottom: 2px solid #eee;">Score</th>
+                                <th style="padding: 12px; border-bottom: 2px solid #eee;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in test_results %}
+                            <tr>
+                                <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ result.course.title }}</td>
+                                <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                                    {{ result.date|date:"M d, Y"}}</td>
+                                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">
+                                    {{ result.marks }}/{{ result.total_marks }}
+                                </td>
+                                <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                                    {% if result.marks >= 12 %}
+                                    <span
+                                        style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:10px; font-size:0.8rem;">Excellent</span>
+                                    {% elif result.marks >= 8 %}
+                                    <span
+                                        style="background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:10px; font-size:0.8rem;">Good</span>
+                                    {% else %}
+                                    <span
+                                        style="background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:10px; font-size:0.8rem;">Needs
+                                        Improvement</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="card" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-chart-bar" style="font-size: 3rem; color: #ccc; margin-bottom: 20px;"></i>
+                    <p>No test results available yet.</p>
+                </div>
+                {% endif %}
             </div>
             <div id="progress" class="content-section">
                 <h2>Progress Tracker</h2>
                 <p>Tracking progress across courses will appear here.</p>
             </div>
-            <div id="messages" class="content-section">
-                <h2>Messages</h2>
-                <p>Parent-Teacher communication will appear here.</p>
+
+            <!-- Messages Section -->
+            <div id="message" class="content-section">
+                <h2 style="margin-bottom: 20px;">Messages</h2>
+
+                <!-- Send Message Form -->
+                <div class="card" style="max-width: 800px; margin-bottom: 30px; padding: 20px;
+                background-color: var(--card-bg); border: var(--border); border-radius: var(--border-radius);">
+                    <form action="{% url 'send_message' %}" method="POST">
+                        {% csrf_token %}
+                        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                            <div style="flex: 1;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Send To
+                                    Role</label>
+                                <select name="contact_role" class="form-control"
+                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                    required>
+                                    <option value="Teacher">Teacher</option>
+                                    <!-- <option value="HR">HR</option> -->
+                                </select>
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Username</label>
+                                <input type="text" name="contact_username" class="form-control"
+                                    placeholder="Enter recipient's username"
+                                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                    required>
+                                <small style="color: #666;">Enter the exact username of the Teacher or HR.</small>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Message</label>
+                            <textarea name="body" class="form-control" rows="4" placeholder="Type your message here..."
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary"
+                            style="background: var(--primary-color); color: white;  width: 100%; padding: 10px 20px; border-radius: 5px; cursor: pointer; border: none;">Send
+                            Message</button>
+                    </form>
+                </div>
+
+                <!-- Message History Table -->
+                <h3 style="margin-bottom: 15px;">Message History</h3>
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 1px solid #eee;">
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Date</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Type</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Role : ID</th>
+                                <th style="padding: 15px; text-align: left; font-weight: 600;">Message</th>
+                                <th style="padding: 15px; text-align: center; font-weight: 600;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in message_history %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 15px; color: #666; font-size: 0.9rem;">
+                                    {{ msg.timestamp|date:"M d, Y H:i" }}
+                                </td>
+                                <td style="padding: 15px;">
+                                    {% if msg.sender_id == parent.id and msg.sender_role == 'Parent' %}
+                                    <span
+                                        style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">Sent</span>
+                                    {% else %}
+                                    <span
+                                        style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">Received</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 15px;">
+                                    {% if msg.sender_id == parent.id and msg.sender_role == 'Parent' %}
+                                    To: {{ msg.recipient_role }} ({{ msg.recipient_id }})
+                                    {% else %}
+                                    From: {{ msg.sender_role }} ({{ msg.sender_id }})
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 15px; max-width: 300px;">
+                                    {{ msg.body }}
+                                </td>
+                                <td style="padding: 15px; text-align: center;">
+                                    <button onclick="deleteMessage({{ msg.id }})"
+                                        style="background: none; border: none; color: #dc3545; cursor: pointer;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="padding: 30px; text-align: center; color: #999;">No messages
+                                    found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div id="schedule" class="content-section">
-                <h2>Schedule</h2>
-                <p>Student's schedule will appear here.</p>
-            </div>
-            <div id="notifications" class="content-section">
-                <h2>Notifications</h2>
-                <p>Notifications will appear here.</p>
-            </div>
-            <div id="alerts" class="content-section">
-                <h2>Alerts</h2>
-                <p>Important alerts will appear here.</p>
-            </div>
-            <div id="settings" class="content-section">
-                <h2>Settings</h2>
-                <p>Account settings will appear here.</p>
-            </div>
+
         </main>
     </div>
     <script>
@@ -1400,8 +1495,19 @@
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 element.classList.add('active');
             }
+
+            // Close sidebar on mobile if open
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            }
         }
     </script>
+    {% include 'chatbot.html' %}
+
+
 </body>
 
 </html>

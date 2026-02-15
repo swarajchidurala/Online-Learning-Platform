@@ -12,16 +12,17 @@
         <div
             style="background-color: #2961eb; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-weight: bold; font-size: 1.1em;">AI Assistant</span>
-            <i class="ri-close-line" id="close-chat" style="cursor: pointer; font-size: 20px;"></i>
+            <div>
+                <i class="ri-refresh-line" id="refresh-chat"
+                    style="cursor: pointer; font-size: 20px; margin-right: 15px;" title="Restart Chat"></i>
+                <i class="ri-close-line" id="close-chat" style="cursor: pointer; font-size: 20px;"></i>
+            </div>
         </div>
 
         <!-- Messages Area -->
         <div id="chat-messages"
             style="flex: 1; padding: 15px; overflow-y: auto; background-color: #f9f9f9; display: flex; flex-direction: column; gap: 10px;">
-            <div
-                style="align-self: flex-start; background-color: #e0e0e0; padding: 10px; border-radius: 10px 10px 10px 0; max-width: 80%;">
-                Hello! How can I help you today?
-            </div>
+
         </div>
 
         <!-- Input Area -->
@@ -56,6 +57,13 @@
         chatWindow.style.display = 'none';
     });
 
+    const refreshChat = document.getElementById('refresh-chat');
+    refreshChat.addEventListener('click', () => {
+        chatMessages.innerHTML = ''; // Clear all messages
+        // Re-initialize with default welcome message
+        appendMessage("Hello! How can I help you today?", 'bot', null, ["About Website", "About Courses", "Roadmap"]);
+    });
+
     // Send Message Logic
     function sendMessage() {
         const message = chatInput.value.trim();
@@ -85,7 +93,7 @@
                 if (loadingElement) loadingElement.remove();
 
                 if (data.response) {
-                    appendMessage(data.response, 'bot');
+                    appendMessage(data.response, 'bot', null, data.options);
                 } else if (data.error) {
                     appendMessage("Error: " + data.error, 'bot');
                 } else {
@@ -110,7 +118,7 @@
         }
     });
 
-    function appendMessage(text, sender, id = null) {
+    function appendMessage(text, sender, id = null, options = []) {
         const messageDiv = document.createElement('div');
         if (id) messageDiv.id = id;
 
@@ -120,11 +128,43 @@
 
         messageDiv.style = style;
 
-        // Convert newlines to <br> for bot messages if needed, or just use textContent
-        // Using innerHTML carefully or just textContent
-        messageDiv.innerText = text;
+        // Use innerHTML for bot to allow <br> and formatting
+        if (sender === 'bot') {
+            // Simple formatting: newlines to <br>, bolding if needed
+            // Also sanitize only if necessary, but here we trust our backend source
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+        } else {
+            messageDiv.innerText = text;
+        }
 
         chatMessages.appendChild(messageDiv);
+
+        // If options exist, append them
+        if (options && options.length > 0 && sender === 'bot') {
+            const optionsDiv = document.createElement('div');
+            optionsDiv.style = "align-self: flex-start; margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px; max-width: 80%;";
+
+            options.forEach(optionText => {
+                const btn = document.createElement('button');
+                btn.innerText = optionText;
+                btn.style = "background-color: white; border: 1px solid #2961eb; color: #2961eb; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.9em; transition: all 0.2s;";
+                btn.onmouseover = () => { btn.style.backgroundColor = '#2961eb'; btn.style.color = 'white'; };
+                btn.onmouseout = () => { btn.style.backgroundColor = 'white'; btn.style.color = '#2961eb'; };
+                btn.onclick = () => {
+                    chatInput.value = optionText;
+                    sendMessage();
+                };
+                optionsDiv.appendChild(btn);
+            });
+            chatMessages.appendChild(optionsDiv);
+        }
+
         chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Initialize with default welcome message and options
+    // Check if empty (to avoid duplicates if re-run)
+    if (chatMessages.children.length === 0) {
+        appendMessage("Hello! How can I help you today?", 'bot', null, ["About Website", "About Courses", "Roadmap"]);
     }
 </script>

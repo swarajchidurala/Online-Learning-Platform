@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: {{ course.title }}</title>
+    <!-- Fonts and Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- Styles inherited from stdpage.html --- */
+        :root {
+            --primary-color: #2961eb;
+            --secondary-color: #6a63d7;
+            --bg-light: #f4f7f9;
+            --text-dark: #333;
+            --text-light: #666;
+            --card-bg: #fff;
+            --border-radius: 12px;
+            --border: 1px solid #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            user-select: none;
+            /* Prevent text selection */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 20px;
+            border: var(--border);
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: calc(var(--animation-order) * 100ms);
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #f8f9fa;
+            border-color: var(--primary-color);
+        }
+
+        .option-label input {
+            margin-right: 12px;
+        }
+
+        .coding-editor {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            width: 100%;
+            min-height: 200px;
+            border: 1px solid #333;
+            resize: vertical;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(41, 97, 235, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(41, 97, 235, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;"> <!-- Disable right click -->
+
+    <div class="container">
+        {% if error %}
+        <div class="card" style="text-align: center; border-left: 5px solid #ef4444">
+            <h2 style="color: #ef4444; margin-bottom: 15px;"><i class="fas fa-exclamation-circle"></i> Error</h2>
+            <p style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 25px;">{{ error }}</p>
+            <a href="{% url 'stdpage' %}" class="submit-btn"
+                style="text-decoration: none; display: inline-block; width: auto;">Back to Dashboard</a>
+        </div>
+        {% else %}
+        <div class="header">
+            <h1>{{ course.title }} - Assessment</h1>
+            <p>Answer the following questions. Time limit: 30 mins.</p>
+        </div>
+
+        <form id="testForm" action="{% url 'submit_test' course.id %}" method="POST">
+            {% csrf_token %}
+
+            {% for q in questions %}
+            <div class="card question-card" id="q{{ q.id }}" style="--animation-order: {{ forloop.counter }};">
+                <div class="question-text">Q{{ forloop.counter }}. {{ q.question }} <span class="error-msg"
+                        style="color:red; display:none; font-size: 0.9em; margin-left: 10px;">* Please answer this
+                        question</span></div>
+
+                <input type="hidden" name="correct_answer_{{ q.id }}" value="{{ q.correct_answer }}">
+
+                {% if q.type == 'mcq' %}
+                <div class="options-grid">
+                    {% for option in q.options %}
+                    <label class="option-label">
+                        <input type="radio" name="question_{{ q.id }}" value="{{ option }}">
+                        {{ option }}
+                    </label>
+                    {% endfor %}
+                </div>
+                {% elif q.type == 'msq' %}
+                <div class="options-grid">
+                    {% for option in q.options %}
+                    <label class="option-label">
+                        <input type="checkbox" name="question_{{ q.id }}" value="{{ option }}">
+                        {{ option }}
+                    </label>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if q.type == 'coding' %}
+                <textarea class="coding-editor" name="question_{{ q.id }}"
+                    placeholder="# Write your code here..."></textarea>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Submit Test</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function (e) {
+            let isValid = true;
+            let firstErrorElement = null;
+
+            const questionCards = document.querySelectorAll('.question-card');
+
+            questionCards.forEach(card => {
+                const inputs = card.querySelectorAll('input[type="radio"], input[type="checkbox"], textarea');
+                let isAnswered = false;
+
+                inputs.forEach(input => {
+                    if ((input.type === 'radio' || input.type === 'checkbox') && input.checked) {
+                        isAnswered = true;
+                    } else if (input.tagName === 'TEXTAREA' && input.value.trim() !== '') {
+                        isAnswered = true;
+                    }
+                });
+
+                const errorMsg = card.querySelector('.error-msg');
+
+                if (!isAnswered) {
+                    isValid = false;
+                    card.style.border = "2px solid #ef4444";
+                    card.style.backgroundColor = "#fff5f5";
+                    if (errorMsg) errorMsg.style.display = "inline";
+
+                    if (!firstErrorElement) {
+                        firstErrorElement = card;
+                    }
+                } else {
+                    card.style.border = "var(--border)";
+                    card.style.backgroundColor = "var(--card-bg)";
+                    if (errorMsg) errorMsg.style.display = "none";
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                if (firstErrorElement) {
+                    firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                // Optional: Alert the user
+                // alert("Please answer all questions before submitting.");
+            }
+        });
+    </script>
+</body>
+
+</html>

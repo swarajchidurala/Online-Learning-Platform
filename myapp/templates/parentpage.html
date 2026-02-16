@@ -1136,27 +1136,24 @@
                         <p>Monitor your child's learning journey and achievements</p>
                     </div>
 
-                    <div class="stats-cards">
+                    <div class="stats-cards" style="user-select: none;">
                         <div class="stat-card progress-card">
-                            <span class="change-tag">+5%</span>
-                            <span class="percentage">68%</span>
+                            <i class="fas fa-chart-line"></i>
+                            <span class="percentage">{{ avg_score }}%</span>
                             <p class="label">Overall Progress</p>
                         </div>
                         <div class="stat-card study-card">
-                            <span class="change-tag red-tag">-2.3h</span>
-                            <span class="time-value">20.3h</span>
+                            <i class="fas fa-clock" style="color:#15803d;"></i>
+                            <span class="time-value">{{ total_week_hours }}h</span>
                             <p class="label">Weekly Study Time</p>
                         </div>
                         <div class="stat-card certificates-card">
-                            <div class="change-tag">
-                                <!-- <i class="fas fa-chart-line"></i> -->
-                                <span class="small-tag">+1 this month</span>
-                            </div>
-                            <span class="count-value">2</span>
+                            <i class="fas fa-certificate" style="color: #ff710c;"></i>
+                            <span class="count-value">{{ certificates.count }}</span>
                             <p class="label">Certificates Earned</p>
                         </div>
                         <div class="stat-card pending-tasks-card">
-                            <span class="change-tag red-tag"> 2 due soon</span>
+                            <i class="fas fa-clock" style="color: #dc2626;"></i>
                             <span class="count-value">1</span>
                             <p class="label">Pending Tasks</p>
                         </div>
@@ -1253,8 +1250,8 @@
 
                             <div class="learning-progress">
                                 <h2>Weekly Study Pattern</h2>
-                                <p>Total Study Time <span class="weekly-time">20.31 h</span></p>
-                                <div class="chart">
+                                <p>Total Study Time <span class="weekly-time">{{ total_week_hours }} h</span></p>
+                                <div class="chart" id="parentStudyChart">
 
                                     <div class="bar-wrapper">
                                         <div class="day">Mon</div>
@@ -1322,6 +1319,7 @@
                 <h2>Child Profile</h2>
                 <p>Child profile details will appear here.</p>
             </div>
+            <!-- Performance Analytics -->
             <div id="performance" class="content-section">
                 <h2>Performance Analytics</h2>
                 {% if test_results %}
@@ -1340,7 +1338,7 @@
                             <tr>
                                 <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ result.course.title }}</td>
                                 <td style="padding: 12px; border-bottom: 1px solid #eee;">
-                                    {{ result.date|date:"M d, Y"}}</td>
+                                    {{ result.date|date:"M d, Y"}} at {{ result.date|time:"g:i A" }}</td>
                                 <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">
                                     {{ result.marks }}/{{ result.total_marks }}
                                 </td>
@@ -1369,9 +1367,14 @@
                 </div>
                 {% endif %}
             </div>
+            <!-- Progress Tracker -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <div id="progress" class="content-section">
                 <h2>Progress Tracker</h2>
-                <p>Tracking progress across courses will appear here.</p>
+                <p>Track your child's test performance over time.</p>
+                <div class="card" style="padding: 20px; height: 400px;">
+                    <canvas id="progressChart"></canvas>
+                </div>
             </div>
 
             <!-- Messages Section -->
@@ -1456,7 +1459,7 @@
                                     {{ msg.body }}
                                 </td>
                                 <td style="padding: 15px; text-align: center;">
-                                    <button onclick="deleteMessage({{ msg.id }})"
+                                    <button onclick="deleteMessage('{{ msg.id }}')"
                                         style="background: none; border: none; color: #dc3545; cursor: pointer;">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -1476,6 +1479,29 @@
         </main>
     </div>
     <script>
+        function deleteMessage(msgId) {
+            if (!confirm('Are you sure you want to delete this message?')) return;
+
+            fetch('/delete_message_api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message_id: msgId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting message: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the message.');
+                });
+        }
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.querySelector('.overlay');
@@ -1484,6 +1510,9 @@
         }
 
         function showSection(sectionId, element) {
+            // Save active section to localStorage
+            localStorage.setItem('parent_activeSection', sectionId);
+
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
 
@@ -1491,21 +1520,152 @@
             document.getElementById(sectionId).classList.add('active');
 
             // Highlight sidebar item
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if (element) {
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 element.classList.add('active');
+            } else {
+                // Try to find nav item by onclick attribute if element not passed
+                const navItem = document.querySelector(`.nav-item[onclick*="'${sectionId}'"]`);
+                if (navItem) navItem.classList.add('active');
             }
 
             // Close sidebar on mobile if open
             if (window.innerWidth <= 768) {
                 const sidebar = document.getElementById('sidebar');
-                if (sidebar.classList.contains('active')) {
+                if (sidebar.classList && sidebar.classList.contains('active')) {
                     toggleSidebar();
                 }
             }
         }
+
+        // Restore active section on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const activeSection = localStorage.getItem('parent_activeSection');
+            if (activeSection) {
+                if (document.getElementById(activeSection)) {
+                    showSection(activeSection);
+                } else {
+                    showSection('child-profile'); // Default to child profile
+                }
+            } else {
+                showSection('child-profile');
+            }
+        });
     </script>
-    {% include 'chatbot.html' %}
+    <script>
+        // ... existing scripts ...
+
+        // Chart.js Implementation
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.5)'); // Primary color low opacity
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+
+            const topics = JSON.parse('{{ graph_topics|escapejs }}');
+
+            const progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: JSON.parse('{{ graph_dates|escapejs }}'),
+                    datasets: [{
+                        label: 'Test Marks',
+                        data: JSON.parse('{{ graph_marks|escapejs }}'),
+                        borderColor: '#4f46e5', // Primary color
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#4f46e5',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function (context) {
+                                    return topics[context[0].dataIndex];
+                                },
+                                label: function (context) {
+                                    return 'Marks: ' + context.raw;
+                                }
+                            },
+                            backgroundColor: '#fff',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: '#ddd',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f3f4f6'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        function deleteMessage(msgId) {
+            if (!confirm('Are you sure you want to delete this message?')) return;
+
+            fetch('/delete_message_api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message_id: msgId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting message: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the message.');
+                });
+        }
+    </script>
+    <script>
+        (function () {
+            const container = document.getElementById('parentStudyChart');
+            if (container) {
+                const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                const studyData = JSON.parse('{{ weekly_study_data|escapejs }}');
+                container.innerHTML = weekDays.map((day, i) => `
+                    <div class="bar-wrapper">
+                        <div class="day">${day}</div>
+                        <div class="bar" style="--bar-height: ${Math.min(studyData[i] * 30, 150)}px;" data-value="${studyData[i]}h"></div>
+                    </div>
+                `).join('');
+            }
+        })();
+    </script>
 
 
 </body>

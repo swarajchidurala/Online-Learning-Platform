@@ -180,13 +180,8 @@
         .header-nav a {
             text-decoration: none;
             color: var(--text-light);
-            margin-right: 25px;
+            margin: 25px;
             font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .header-nav a:hover {
-            color: var(--primary-color);
         }
 
         .user-profile {
@@ -554,7 +549,7 @@
             background-image: var(--potential-color);
             color: white;
             border: none;
-            margin-left: 20px;
+            /* margin-left: 20px; */
             padding: 10px 18px;
             border-radius: var(--border-radius);
             font-weight: bold;
@@ -1034,8 +1029,6 @@
                     Messages</div>
                 <div class="nav-item" onclick="showSection('certificates', this)"><i class="fas fa-certificate"></i>
                     Certificates</div>
-                <div class="nav-item" onclick="showSection('notifications', this)"><i class="fas fa-bell"></i>
-                    Notifications</div>
                 <div class="nav-item" onclick="showSection('achievements', this)"><i class="fas fa-trophy"></i>
                     Achievements</div>
                 <div class="nav-item" onclick="showSection('recent', this)"><i class="fas fa-calendar-alt"></i>
@@ -1072,24 +1065,23 @@
                         <h1>Welcome back, {{ student.name }}! 👋</h1>
                         <p>Ready to continue your learning journey?</p>
                     </div>
-
-                    <div class="stats-cards">
+                    <div class="stats-cards" style="user-select: none;">
                         <div class="stat-card">
                             <i class="fas fa-layer-group"></i>
                             <p>{{ course_contents.count }}</p>
                             <span>Courses</span>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" style="user-select: none;">
                             <i class="fas fa-signal"></i>
-                            <p>68%</p>
+                            <p>{{ avg_score }}%</p>
                             <span>Progress</span>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" style="user-select: none;">
                             <i class="fas fa-clock"></i>
-                            <p>12h</p>
+                            <p>{{ total_week_hours }}h</p>
                             <span>Study Time</span>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" style="user-select: none;">
                             <i class="fas fa-trophy"></i>
                             <p>{{ certificates.count }}</p>
                             <span>Certificates</span>
@@ -1139,9 +1131,9 @@
 
 
                             <div class="learning-progress">
-                                <h2>Learning Progress</h2>
-                                <p>Weekly Study Pattern <span class="weekly-time">20.31 h</span></p>
-                                <div class="chart">
+                                <h2>Study Time</h2>
+                                <p>Weekly Study Pattern <span class="weekly-time">{{ total_week_hours }} h</span></p>
+                                <div class="chart" id="weeklyStudyChart">
 
                                     <div class="bar-wrapper">
                                         <div class="day">Mon</div>
@@ -1201,7 +1193,7 @@
                                         <li>
                                             {% if activity.activity_type == 'Login' %}
                                             <i class="fas fa-sign-in-alt" style="color: var(--primary-color);"></i>
-                                            {% elif activity.activity_type == 'Test' %}
+                                            {% elif activity.activity_type == 'Submit_test' %}
                                             <i class="fas fa-check-circle" style="color: #10b981;"></i>
                                             {% elif activity.activity_type == 'Course' %}
                                             <i class="fas fa-book-reader" style="color: var(--secondary-color);"></i>
@@ -1302,9 +1294,13 @@
                     {% endfor %}
                 </div>
             </div>
+            <!-- Progress Tracker -->
             <div id="progress" class="content-section">
                 <h2>Progress Tracker</h2>
-                <p>Progress analytics will appear here.</p>
+                <p>Track your test performance over time.</p>
+                <div class="card" style="padding: 20px; height: 400px;">
+                    <canvas id="progressChart"></canvas>
+                </div>
             </div>
             <div id="message" class="content-section">
                 <h2 style="margin-bottom: 20px;">Messages</h2>
@@ -1387,7 +1383,7 @@
                                     {{ msg.body }}
                                 </td>
                                 <td style="padding: 15px; text-align: center;">
-                                    <button onclick="deleteMessage({{ msg.id }})"
+                                    <button onclick="deleteMessage('{{ msg.id }}')"
                                         style="background: none; border: none; color: #dc3545; cursor: pointer;">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -1403,14 +1399,115 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Certificates -->
             <div id="certificates" class="content-section">
-                <h2>My Certificates</h2>
-                <p>Certificates will appear here.</p>
+                <h2>Certificates</h2>
+                <style>
+                    @keyframes float {
+
+                        0%,
+                        100% {
+                            transform: translateY(0);
+                        }
+
+                        50% {
+                            transform: translateY(-15px);
+                        }
+                    }
+
+                    .coming-soon-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 60vh;
+                        text-align: center;
+                        padding: 2rem;
+                    }
+
+                    .coming-soon-card {
+                        background: white;
+                        padding: 3rem;
+                        border-radius: 20px;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+                        max-width: 500px;
+                        width: 100%;
+                        border: 1px solid rgba(0, 0, 0, 0.05);
+                    }
+
+                    .coming-soon-icon {
+                        font-size: 5rem;
+                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        -webkit-background-clip: text;
+                        background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        margin-bottom: 1.5rem;
+                        animation: float 3s ease-in-out infinite;
+                        display: inline-block;
+                    }
+
+                    .coming-soon-title {
+                        font-size: 2rem;
+                        font-weight: 700;
+                        color: var(--text-dark);
+                        margin-bottom: 1rem;
+                        background: linear-gradient(135deg, var(--primary-color), var(--text-dark));
+                        -webkit-background-clip: text;
+                        background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                    }
+
+                    .coming-soon-text {
+                        color: var(--text-light);
+                        font-size: 1.1rem;
+                        line-height: 1.6;
+                        margin-bottom: 2rem;
+                    }
+
+                    .back-btn {
+                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        color: white;
+                        border: none;
+                        padding: 12px 35px;
+                        border-radius: 50px;
+                        font-size: 1rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+
+                    .back-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+                    }
+
+                    .back-btn:active {
+                        transform: translateY(1px);
+                    }
+                </style>
+                <div class="coming-soon-container">
+                    <div class="coming-soon-card">
+                        <i class="fas fa-medal coming-soon-icon"></i>
+                        <h2 class="coming-soon-title">Certificates Coming Soon!</h2>
+                        <p class="coming-soon-text">
+                            We're crafting a new certification system to recognize your achievements.
+                            <br>Stay tuned for updates!
+                        </p>
+                        <button
+                            onclick="showSection('overview', document.querySelector('.nav-item[onclick*=\'overview\']'))"
+                            class="back-btn">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div id="notifications" class="content-section">
-                <h2>Notifications</h2>
-                <p>Notifications will appear here.</p>
-            </div>
+
+            <!-- Achievements -->
             <div id="achievements" class="content-section">
                 <h2>All Achievements</h2>
                 <div class="card" style="padding: 20px;">
@@ -1420,7 +1517,7 @@
                                 <th style="padding: 12px; color: var(--text-light);">Course</th>
                                 <th style="padding: 12px; color: var(--text-light);">Score</th>
                                 <th style="padding: 12px; color: var(--text-light);">Date</th>
-                                <th style="padding: 12px; color: var(--text-light);">Action</th>
+                                <th style="padding: 12px; padding-left: 40px; color: var(--text-light);">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1451,7 +1548,8 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" style="text-align: center; padding: 20px; color: #888;">No achievements
+                                <td colspan="4" style="text-align: center; padding: 20px; color: #888;">No
+                                    achievements
                                     yet.</td>
                             </tr>
                             {% endfor %}
@@ -1460,7 +1558,7 @@
                 </div>
             </div>
 
-
+            <!-- Recent Activities -->
             <div id="recent" class="content-section">
                 <h2>Recent Activities (Last 3 Months)</h2>
                 <div class="card" style="padding: 20px;">
@@ -1479,13 +1577,13 @@
                                     {% if activity.activity_type == 'Login' %}
                                     <i class="fas fa-sign-in-alt"
                                         style="color: var(--primary-color); margin-right: 8px;"></i>
-                                    {% elif activity.activity_type == 'Submit Test' %}
+                                    {% elif activity.activity_type == 'Submit_test' %}
                                     <i class="fas fa-check-circle" style="color: #10b981; margin-right: 8px;"></i>
                                     {% elif activity.activity_type == 'Course' %}
                                     <i class="fas fa-book-reader"
                                         style="color: var(--secondary-color); margin-right: 8px;"></i>
                                     {% else %}
-                                    <i class="fas fa-bell" style="color: #f59e0b; margin-right: 8px;"></i>
+                                    <i class="fas fa-check-circle" style="color: #10b981; margin-right: 8px;"></i>
                                     {% endif %}
 
                                     {% if activity.reference_link %}
@@ -1514,6 +1612,8 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Settings -->
             <div id="settings" class="content-section">
                 <h2>Settings</h2>
                 <p>Settings configuration will appear here.</p>
@@ -1530,6 +1630,9 @@
         }
 
         function showSection(sectionId, element) {
+            // Save active section to localStorage
+            localStorage.setItem('std_activeSection', sectionId);
+
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
 
@@ -1537,19 +1640,38 @@
             document.getElementById(sectionId).classList.add('active');
 
             // Highlight sidebar item
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if (element) {
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 element.classList.add('active');
+            } else {
+                // Try to find nav item by onclick attribute if element not passed
+                const navItem = document.querySelector(`.nav-item[onclick*="'${sectionId}'"]`);
+                if (navItem) navItem.classList.add('active');
             }
 
             // Close sidebar on mobile if open
             if (window.innerWidth <= 768) {
                 const sidebar = document.getElementById('sidebar');
-                if (sidebar.classList.contains('active')) {
+                if (sidebar.classList && sidebar.classList.contains('active')) {
                     toggleSidebar();
                 }
             }
         }
+
+        // Restore active section on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const activeSection = localStorage.getItem('std_activeSection');
+            if (activeSection) {
+                // Check if element exists before showing
+                if (document.getElementById(activeSection)) {
+                    showSection(activeSection);
+                } else {
+                    showSection('dashboard');
+                }
+            } else {
+                showSection('dashboard');
+            }
+        });
     </script>
 
     <!-- Course Detail Modal (Moved outside dashboard for global access) -->
@@ -1571,7 +1693,7 @@
             document.getElementById('modalDescription').innerText = description;
 
             // Record Activity
-            recordActivity(title, 'Course', fileUrl);
+            recordActivity(title, 'Course', courseId);
 
             const contentArea = document.getElementById('modalContentArea');
             contentArea.innerHTML = ''; // Clear previous content
@@ -1740,6 +1862,121 @@
     {% include 'chatbot.html' %}
 
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ... existing scripts ...
+
+        // Chart.js Implementation
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.5)'); // Primary color low opacity
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+
+            const topics = JSON.parse('{{ graph_topics|escapejs }}');
+
+            const progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: JSON.parse('{{ graph_dates|escapejs }}'),
+                    datasets: [{
+                        label: 'Test Marks',
+                        data: JSON.parse('{{ graph_marks|escapejs }}'),
+                        borderColor: '#4f46e5', // Primary color
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#4f46e5',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function (context) {
+                                    return topics[context[0].dataIndex];
+                                },
+                                label: function (context) {
+                                    return 'Marks: ' + context.raw;
+                                }
+                            },
+                            backgroundColor: '#fff',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: '#ddd',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f3f4f6'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        function deleteMessage(msgId) {
+            if (!confirm('Are you sure you want to delete this message?')) return;
+
+            fetch('/delete_message_api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message_id: msgId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting message: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the message.');
+                });
+        }
+    </script>
+    <script>
+        (function () {
+            const container = document.getElementById('weeklyStudyChart');
+            if (container) {
+                const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                const studyData = JSON.parse('{{ weekly_study_data|escapejs }}');
+                container.innerHTML = weekDays.map((day, i) => `
+                    <div class="bar-wrapper">
+                        <div class="day">${day}</div>
+                        <div class="bar" style="--bar-height: ${Math.min(studyData[i] * 30, 150)}px;" data-value="${studyData[i]}h"></div>
+                    </div>
+                `).join('');
+            }
+        })();
+    </script>
 </body>
 
 </html>

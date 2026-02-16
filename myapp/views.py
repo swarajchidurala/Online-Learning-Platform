@@ -10,7 +10,36 @@ from django.utils import timezone
 
 # Create your views here.
 
-
+def get_weekly_study_data(student):
+    if not student:
+        return [0]*7, 0
+    
+    # Get current date and find the start of the week (Monday)
+    now = timezone.now()
+    # weekday() is 0 (Mon) to 6 (Sun)
+    start_of_week = now - timezone.timedelta(days=now.weekday()) 
+    start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    # Filter test results for this week
+    weekly_results = models.TestResult.objects.filter(
+        student=student, 
+        date__gte=start_of_week
+    )
+    
+    # Aggregation: 7 days, Mon to Sun
+    study_data = [0]*7
+    for result in weekly_results:
+        day_idx = result.date.weekday()
+        if 0 <= day_idx < 7:
+            study_data[day_idx] += result.study_time_seconds
+        
+    study_data_hours = [round(seconds / 3600, 2) for seconds in study_data]
+    total_week_seconds = sum(study_data)
+    total_week_hours = round(total_week_seconds / 3600, 2)
+    
+    # If no data, provide some mock data for visualization if requested, 
+    # but requirement implies actual calculation.
+    return study_data_hours, total_week_hours
 def index(request):
     return render(request, 'index.html')
 
@@ -191,7 +220,21 @@ def stdpage(request):
             (Q(recipient_id=student.id, recipient_role='Student') & Q(deleted_by_recipient=False))
          ).order_by('-timestamp')
          
-         # Enrich with names (optional, or do in template)
+    # Certificates
+    certificates = models.certificate.objects.filter(student=student)
+
+    # Weekly Study Data
+    weekly_study_data, total_week_hours = get_weekly_study_data(student)
+
+    # Graph Data
+    graph_data = test_results.order_by('date')
+    graph_dates = [result.date.strftime("%d-%m-%Y") for result in graph_data]
+    graph_topics = [result.course.title for result in graph_data]
+    graph_marks = [result.marks for result in graph_data]
+    
+    avg_score = 0
+    if graph_marks:
+        avg_score = round(sum(graph_marks) / len(graph_marks))
 
     return render(request,'stdpage.html', {
         'student': student, 
@@ -200,7 +243,13 @@ def stdpage(request):
         'top_activities': top_activities,
         'recent_activities_all': recent_activities_all,
         'teachers': teachers,
-        'message_history': message_history
+        'message_history': message_history,
+        'certificates': certificates,
+        'graph_dates': json.dumps(graph_dates),
+        'graph_marks': json.dumps(graph_marks),
+        'graph_topics': json.dumps(graph_topics),
+
+        'avg_score': avg_score,
     })
 
 def parentpage(request):
@@ -213,15 +262,37 @@ def parentpage(request):
          except models.Parent.DoesNotExist:
              return redirect('login')
 
-    test_results = []
+    test_results = models.TestResult.objects.none()
+    certificates = []
     if parent:
         # Attempt to find student by childname
         child_student = models.Student.objects.filter(name=parent.childname).first()
         if child_student:
              test_results = models.TestResult.objects.filter(student=child_student).order_by('-date')
+             certificates = models.certificate.objects.filter(student=child_student)
+             
+             # Weekly Study Data for Child
+             weekly_study_data, total_week_hours = get_weekly_study_data(child_student)
+        else:
+             weekly_study_data, total_week_hours = [0]*7, 0
+    else:
+        weekly_study_data, total_week_hours = [0]*7, 0
     
     teachers = models.Teacher.objects.all()
+    
+    # # Certificates
+    # certificates = models.certificate.objects.filter(student=parent)
 
+    # Graph Data
+    graph_data = test_results.order_by('date')
+    graph_dates = [result.date.strftime("%d-%m-%Y") for result in graph_data]
+    graph_topics = [result.course.title for result in graph_data]
+    graph_marks = [result.marks for result in graph_data]
+
+    avg_score = 0
+    if graph_marks:
+        avg_score = round(sum(graph_marks) / len(graph_marks))
+    
     # Message History for Parent
     message_history = []
     if parent:
@@ -230,7 +301,21 @@ def parentpage(request):
             (Q(recipient_id=parent.id, recipient_role='Parent') & Q(deleted_by_recipient=False))
          ).order_by('-timestamp')
 
-    return render(request,'parentpage.html', {'parent': parent, 'test_results': test_results, 'teachers': teachers, 'message_history': message_history})
+    return render(request,'parentpage.html', {
+        'parent': parent, 
+        'test_results': test_results, 
+        'teachers': teachers, 
+        'message_history': message_history, 
+        'certificates': certificates,
+        'weekly_study_data': json.dumps(weekly_study_data),
+        'total_week_hours': total_week_hours,
+        'graph_dates': json.dumps(graph_dates), 
+        'graph_marks': json.dumps(graph_marks), 
+        'graph_topics': json.dumps(graph_topics),
+        'weekly_study_data': json.dumps(weekly_study_data),
+        'total_week_hours': total_week_hours,
+        'avg_score': avg_score,
+    })
 
 def tchrpage(request):
     user_id = request.session.get('user_id')
@@ -421,6 +506,16 @@ def record_activity_api(request):
                     activity_type=activity_type,
                     reference_link=reference_link
                 )
+                
+                # If viewing a course, record the start time in session
+                if activity_type == 'Course' and reference_link:
+                    try:
+                        # reference_link is usually the course ID
+                        course_id = reference_link
+                        request.session[f'study_start_{course_id}'] = timezone.now().isoformat()
+                    except Exception as e:
+                        print(f"Error saving study start time: {e}")
+                
                 return JsonResponse({'status': 'success'})
             return JsonResponse({'error': 'Unauthorized'}, status=401)
         except Exception as e:
@@ -547,12 +642,31 @@ def submit_test(request, course_id):
                     q['user_selected'] = selected_answer
                     q['is_correct'] = (selected_answer == correct_answer)
 
+            # Calculate study duration
+            duration_seconds = 0
+            start_time_iso = request.session.get(f'study_start_{course_id}')
+            if start_time_iso:
+                try:
+                    start_time = timezone.datetime.fromisoformat(start_time_iso)
+                    # Handle naive/aware datetime comparison if necessary
+                    if timezone.is_aware(start_time):
+                        duration = timezone.now() - start_time
+                    else:
+                        duration = timezone.datetime.now() - start_time
+                    duration_seconds = int(duration.total_seconds())
+                    
+                    # Clear session variable after use
+                    del request.session[f'study_start_{course_id}']
+                except Exception as e:
+                    print(f"Error calculating duration: {e}")
+
             # Save result
             models.TestResult.objects.create(
                 student=student,
                 course=course,
                 marks=score,
-                total_marks=total_questions
+                total_marks=total_questions,
+                study_time_seconds=duration_seconds
             )
 
             # Record Test Completion Activity

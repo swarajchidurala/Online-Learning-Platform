@@ -75,6 +75,7 @@ class TestResult(models.Model):
     marks = models.IntegerField()
     total_marks = models.IntegerField(default=15)
     date = models.DateTimeField(auto_now_add=True)
+    study_time_seconds = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.student.username} - {self.course.title} - {self.marks}/{self.total_marks}"
@@ -88,3 +89,16 @@ class StudentActivity(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.activity_name} ({self.timestamp})"
+
+
+class certificate(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(CourseContent, on_delete=models.CASCADE)
+    certificate = models.FileField(upload_to='certificates/')
+    date = models.DateTimeField(auto_now_add=True)
+    total_marks = models.IntegerField(default=15)
+
+
+    def __str__(self):
+        return f"{self.student.username} - {self.course.title}"
+

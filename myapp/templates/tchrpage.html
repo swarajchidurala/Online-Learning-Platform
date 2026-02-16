@@ -602,6 +602,91 @@
             border: var(--border);
             transition: transform 0.2s;
         }
+
+        /* --- Modal Styles --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
     </style>
 </head>
 
@@ -635,7 +720,7 @@
                     <i class="fas fa-wallet"></i> Earnings
                 </div>
             </nav>
-            <a href="{% url 'mainpage' %}" class="nav-item" style="margin-top: auto; color: #dc2626;">
+            <a href="/login/" class="nav-item" style="margin-top: auto; color: #dc2626;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </aside>
@@ -666,12 +751,12 @@
                 <div class="stats-cards">
                     <div class="stat-card">
                         <i class="fas fa-users"></i>
-                        <p>1,254</p>
+                        <p>{{ students.count }}</p>
                         <span>Total Students</span>
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-book"></i>
-                        <p>12</p>
+                        <p>{{ teacher_courses.count }}</p>
                         <span>Active Courses</span>
                     </div>
                     <div class="stat-card">
@@ -762,42 +847,37 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for course in teacher_courses %}
                             <tr>
-                                <td>Intro to Data Science</td>
-                                <td><span
-                                        style="background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:10px; font-size:0.8rem;">Video</span>
-                                </td>
-                                <td>Oct 12, 2023</td>
-                                <td>342</td>
+                                <td>{{ course.title }}</td>
                                 <td>
-                                    <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></button>
+                                    <span style="padding:2px 8px; border-radius:10px; font-size:0.8rem; 
+                                        {% if course.content_type == 'Video' %}background:#e0f2fe; color:#0284c7;
+                                        {% elif course.content_type == 'PDF' %}background:#fce7f3; color:#be185d;
+                                        {% else %}background:#dcfce7; color:#15803d;{% endif %}">
+                                        {{ course.content_type }}
+                                    </span>
+                                </td>
+                                <td>{{ course.uploaded_at|date:"M d, Y" }}</td>
+                                <td>{{ course.view_count }}</td>
+                                <td>
+                                    <button class="action-btn edit-btn"
+                                        onclick="openEditModal('{{ course.id }}', '{{ course.title|escapejs }}', '{{ course.description|escapejs }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a href="{% url 'delete_course' course.id %}" class="action-btn delete-btn"
+                                        onclick="return confirm('Are you sure you want to delete this course?')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
                                 </td>
                             </tr>
+                            {% empty %}
                             <tr>
-                                <td>Python Cheat Sheet</td>
-                                <td><span
-                                        style="background:#fce7f3; color:#be185d; padding:2px 8px; border-radius:10px; font-size:0.8rem;">PDF</span>
-                                </td>
-                                <td>Oct 08, 2023</td>
-                                <td>890</td>
-                                <td>
-                                    <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></button>
-                                </td>
+                                <td colspan="5" style="text-align: center; color: var(--text-light);">No courses
+                                    uploaded yet.</td>
                             </tr>
-                            <tr>
-                                <td>Live Q&A Session</td>
-                                <td><span
-                                        style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:10px; font-size:0.8rem;">Live</span>
-                                </td>
-                                <td>Oct 05, 2023</td>
-                                <td>120</td>
-                                <td>
-                                    <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
+                            {% endfor %}
+                        </tbody>
                         </tbody>
                     </table>
                 </div>
@@ -808,8 +888,8 @@
                 <div class="section-card">
                     <h2><i class="fas fa-chart-line"></i> Top Performers</h2>
                     <div style="margin-top: 10px;">
-                        {% if test_results %}
-                        {% for result in test_results %}
+                        {% if top_performers %}
+                        {% for result in top_performers %}
                         <div class="student-item">
                             <div class="student-avatar student-avatar-theme-{% cycle '1' '2' '3' '4' %}">
                                 {{ result.student.name|slice:":2"|upper }}
@@ -1020,6 +1100,59 @@
                     console.error('Error:', error);
                     alert('An error occurred while deleting the message.');
                 });
+        }
+    </script>
+
+    <!-- Edit Course Modal -->
+    <div id="editCourseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Course</h3>
+                <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form id="editCourseForm" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Course Title</label>
+                    <input type="text" name="title" id="edit-course-title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" id="edit-course-description" class="form-control" rows="4"
+                        required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-upload" style="width: auto; margin: 0;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(id, title, description) {
+            const modal = document.getElementById('editCourseModal');
+            const form = document.getElementById('editCourseForm');
+            const titleInput = document.getElementById('edit-course-title');
+            const descInput = document.getElementById('edit-course-description');
+
+            form.action = `/edit_course/${id}/`;
+            titleInput.value = title;
+            descInput.value = description;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editCourseModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('editCourseModal');
+            if (event.target == modal) {
+                closeEditModal();
+            }
         }
     </script>
     {% include 'chatbot.html' %}

@@ -481,7 +481,7 @@
                     <div class="candidate-item">
                         <div
                             class="candidate-avatar {% cycle 'avatar-gray' 'avatar-pink' 'avatar-green' 'avatar-blue' %}">
-                            {{ result.student.name|slice:":5"|upper }}
+                            {{ result.student.name|slice:":2"|upper }}
                         </div>
                         <div class="candidate-info">
                             <div class="candidate-name">{{ result.student.name }}</div>
@@ -492,8 +492,8 @@
                             </div>
                         </div>
                         <div style="text-align: right;">
-                            <div style="color: var(--primary-color); font-weight: bold;">{{ result.marks }}/{{
-                                result.total_marks }}</div>
+                            <div style="color: var(--primary-color); font-weight: bold;">{{ result.marks }}/
+                                {{result.total_marks }}</div>
                             <small>{{ result.date|date:"M d" }}</small>
                         </div>
                     </div>

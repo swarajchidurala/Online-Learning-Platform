@@ -22,7 +22,10 @@ urlpatterns = [
     path('api/send_message/', views.send_message_api, name='send_message_api'),
     path('api/delete_message/', views.delete_message_api, name='delete_message_api'),
     path('logout/', views.logout_view, name='logout'),
-]
+    path('edit_course/<int:course_id>/', views.edit_course, name='edit_course'),
+    path('delete_course/<int:course_id>/', views.delete_course, name='delete_course'),
+] # Force reload comment
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

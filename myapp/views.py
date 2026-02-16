@@ -62,7 +62,8 @@ def register(request):
             user = models.Parent(name=name, username=username, childname=childname, email=email, password=password)
             user.save()
         elif user_type == 'teacher':
-            user = models.Teacher(name=name, username=username, email=email, password=password)
+            phone = request.POST.get('phone')
+            user = models.Teacher(name=name, username=username, email=email, phone=phone, password=password)
             user.save()
         elif user_type == 'hr':
             try:
@@ -248,7 +249,8 @@ def stdpage(request):
         'graph_dates': json.dumps(graph_dates),
         'graph_marks': json.dumps(graph_marks),
         'graph_topics': json.dumps(graph_topics),
-
+        'weekly_study_data': json.dumps(weekly_study_data),
+        'total_week_hours': total_week_hours,
         'avg_score': avg_score,
     })
 
@@ -307,8 +309,6 @@ def parentpage(request):
         'teachers': teachers, 
         'message_history': message_history, 
         'certificates': certificates,
-        'weekly_study_data': json.dumps(weekly_study_data),
-        'total_week_hours': total_week_hours,
         'graph_dates': json.dumps(graph_dates), 
         'graph_marks': json.dumps(graph_marks), 
         'graph_topics': json.dumps(graph_topics),
@@ -350,6 +350,17 @@ def tchrpage(request):
     students = models.Student.objects.all()
     parents = models.Parent.objects.all()
     hr_users = models.HR.objects.all()
+
+    teacher_courses = []
+    if teacher:
+        teacher_courses = models.CourseContent.objects.filter(teacher=teacher).order_by('-uploaded_at')
+        # Add view counts to each course
+        for course in teacher_courses:
+            # reference_link in StudentActivity for Courses is the course ID
+            course.view_count = models.StudentActivity.objects.filter(
+                activity_type='Course', 
+                reference_link=str(course.id)
+            ).count()
             
     return render(request,'tchrpage.html', {
         'teacher': teacher,
@@ -357,8 +368,38 @@ def tchrpage(request):
         'students': students,
         'parents': parents,
         'hr_users': hr_users,
-        'message_history': message_history
+        'message_history': message_history,
+        'teacher_courses': teacher_courses
     })
+
+def edit_course(request, course_id):
+    if request.method == 'POST':
+        user_id = request.session.get('user_id')
+        user_type = request.session.get('user_type')
+        
+        if user_type == 'teacher' and user_id:
+            try:
+                course = models.CourseContent.objects.get(id=course_id, teacher_id=user_id)
+                course.title = request.POST.get('title')
+                course.description = request.POST.get('description')
+                course.save()
+            except models.CourseContent.DoesNotExist:
+                print(f"Course {course_id} not found or not owned by teacher {user_id}")
+                
+    return redirect('tchrpage')
+
+def delete_course(request, course_id):
+    user_id = request.session.get('user_id')
+    user_type = request.session.get('user_type')
+    
+    if user_type == 'teacher' and user_id:
+        try:
+            course = models.CourseContent.objects.get(id=course_id, teacher_id=user_id)
+            course.delete()
+        except models.CourseContent.DoesNotExist:
+             print(f"Course {course_id} not found or not owned by teacher {user_id}")
+             
+    return redirect('tchrpage')
 
 def send_message(request):
     if request.method == 'POST':

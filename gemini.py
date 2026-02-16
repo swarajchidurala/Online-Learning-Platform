@@ -2,7 +2,7 @@ from google import genai
 
 
 
-client = genai.Client(api_key="AIzaSyAzF8eLXknsJW55atnR9qVgzaA9Ync-PC0")
+client = genai.Client(api_key="AIzaSyCBEmZwcrwcHXIW6KBPDZf_yEK_GhHn6hA")
 
 
 def get_gemini_response(user_input):

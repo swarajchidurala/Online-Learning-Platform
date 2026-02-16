@@ -439,7 +439,10 @@
             setActiveTab(teacherTab);
             document.getElementById("user_type").value = "teacher";
             childNameField.style.display = "none";
-            hrFields.style.display = "none";
+            hrFields.style.display = "block"; // Show phone field via hrFields wrapper
+            document.getElementById("phone").closest('.form-group').style.display = "block";
+            document.getElementById("company_employee_id").closest('.form-group').style.display = "none";
+            document.getElementById("company_details").style.display = "none";
             document.getElementById("childname").required = false;
         });
 
@@ -449,6 +452,9 @@
             document.getElementById("user_type").value = "hr";
             childNameField.style.display = "none";
             hrFields.style.display = "block";
+            document.getElementById("phone").closest('.form-group').style.display = "block";
+            document.getElementById("company_employee_id").closest('.form-group').style.display = "block";
+            document.getElementById("company_details").style.display = "block";
             document.getElementById("childname").required = false;
         });
 
